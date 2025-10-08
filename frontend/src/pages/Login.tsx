@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { API_BASE_URL } from '../lib/api'
+import { API_BASE_URL, testAPIConnection } from '../lib/api'
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,6 +22,16 @@ export default function Login() {
     e.preventDefault()
     setError(null)
     setLoading(true)
+    
+    // Test API connection first
+    console.log('🔍 Testing API connection...');
+    const isConnected = await testAPIConnection();
+    if (!isConnected) {
+      setError('Cannot connect to backend server. Please check if backend is deployed and running.');
+      setLoading(false);
+      return;
+    }
+    
     try {
       if (mode === 'login') {
         console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);

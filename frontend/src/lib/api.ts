@@ -1,15 +1,35 @@
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://spiceexpress-backend.onrender.com/api'
-  : 'http://localhost:5000/api';
+// Get API URL with fallback options
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD 
+    ? 'https://spiceexpress-backend.onrender.com/api'
+    : 'http://localhost:5000/api');
 
 // Debug logging (temporary)
 console.log('🚀 API Configuration:');
+console.log('- VITE_API_URL:', import.meta.env.VITE_API_URL);
 console.log('- PROD mode:', import.meta.env.PROD);
 console.log('- MODE:', import.meta.env.MODE);
-console.log('- API_BASE_URL:', API_BASE_URL);
+console.log('- Final API_BASE_URL:', API_BASE_URL);
+console.log('- Current URL:', window.location.href);
 
 export { API_BASE_URL };
 
+// Test API connectivity
+export async function testAPIConnection(): Promise<boolean> {
+  try {
+    console.log('🔍 Testing API connection to:', API_BASE_URL.replace('/api', '/health'));
+    const response = await fetch(API_BASE_URL.replace('/api', '/health'), {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'omit'
+    });
+    console.log('🏥 Health check response:', response.status, response.statusText);
+    return response.ok;
+  } catch (error) {
+    console.error('❌ API connection test failed:', error);
+    return false;
+  }
+}
 
 function authHeaders(): HeadersInit {
   const token = localStorage.getItem('auth_token');
