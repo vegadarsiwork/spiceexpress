@@ -2,6 +2,12 @@ const API_BASE_URL = import.meta.env.PROD
   ? 'https://spiceexpress-backend.onrender.com/api'
   : 'http://localhost:5000/api';
 
+// Debug logging (temporary)
+console.log('🚀 API Configuration:');
+console.log('- PROD mode:', import.meta.env.PROD);
+console.log('- MODE:', import.meta.env.MODE);
+console.log('- API_BASE_URL:', API_BASE_URL);
+
 export { API_BASE_URL };
 
 
@@ -11,19 +17,45 @@ function authHeaders(): HeadersInit {
 }
 
 export async function httpGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, { headers: { ...authHeaders() } })
-  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`)
-  return res.json()
+  try {
+    console.log(`🔄 GET ${API_BASE_URL}${path}`);
+    const res = await fetch(`${API_BASE_URL}${path}`, { 
+      headers: { ...authHeaders() },
+      mode: 'cors',
+      credentials: 'omit'
+    });
+    console.log(`📊 Response:`, res.status, res.statusText);
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => 'Unknown error');
+      throw new Error(`GET ${path} failed: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+    return res.json();
+  } catch (error) {
+    console.error(`❌ GET ${path} error:`, error);
+    throw error;
+  }
 }
 
 export async function httpPost<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders() },
-    body: JSON.stringify(body),
-  })
-  if (!res.ok) throw new Error(`POST ${path} failed: ${res.status}`)
-  return res.json()
+  try {
+    console.log(`🔄 POST ${API_BASE_URL}${path}`, body);
+    const res = await fetch(`${API_BASE_URL}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(body),
+      mode: 'cors',
+      credentials: 'omit'
+    });
+    console.log(`📊 Response:`, res.status, res.statusText);
+    if (!res.ok) {
+      const errorText = await res.text().catch(() => 'Unknown error');
+      throw new Error(`POST ${path} failed: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+    return res.json();
+  } catch (error) {
+    console.error(`❌ POST ${path} error:`, error);
+    throw error;
+  }
 }
 
 // LR API functions

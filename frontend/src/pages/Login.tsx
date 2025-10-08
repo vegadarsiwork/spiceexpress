@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { API_BASE_URL } from '../lib/api'
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,12 +24,20 @@ export default function Login() {
     setLoading(true)
     try {
       if (mode === 'login') {
-        const res = await fetch('/api/auth/login', {
+        console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
+        const res = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
+          mode: 'cors',
+          credentials: 'omit'
         })
-        if (!res.ok) throw new Error('Login failed')
+        console.log('📊 Login response:', res.status, res.statusText);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('❌ Login error response:', errorText);
+          throw new Error(`Login failed: ${res.status} ${res.statusText} - ${errorText}`);
+        }
         const json = await res.json()
         localStorage.setItem('auth_token', json.token)
         if (json.user) {
@@ -36,17 +45,28 @@ export default function Login() {
         }
         window.location.href = '/'
       } else {
-        const res = await fetch('/api/auth/register', {
+        console.log('📝 Attempting register to:', `${API_BASE_URL}/auth/register`);
+        const res = await fetch(`${API_BASE_URL}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password }),
         })
-        if (!res.ok) throw new Error('Registration failed')
+        console.log('📊 Register response:', res.status, res.statusText);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('❌ Register error response:', errorText);
+          throw new Error(`Registration failed: ${res.status} ${res.statusText} - ${errorText}`);
+        }
         setMode('login')
         setError('Registration successful! Please sign in.')
       }
     } catch (err: any) {
-      setError(err.message ?? (mode === 'login' ? 'Login failed' : 'Registration failed'))
+      console.error('🚨 Auth error:', err);
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError('Connection failed - check if backend is running');
+      } else {
+        setError(err.message ?? (mode === 'login' ? 'Login failed' : 'Registration failed'));
+      }
     } finally {
       setLoading(false)
     }
