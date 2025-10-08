@@ -21,12 +21,25 @@ export async function testAPIConnection(): Promise<boolean> {
     const response = await fetch(API_BASE_URL.replace('/api', '/health'), {
       method: 'GET',
       mode: 'cors',
-      credentials: 'omit'
+      credentials: 'omit',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
     console.log('🏥 Health check response:', response.status, response.statusText);
-    return response.ok;
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ Backend is healthy:', data);
+      return true;
+    } else {
+      console.warn('⚠️ Backend responded with error:', response.status);
+      return false;
+    }
   } catch (error) {
     console.error('❌ API connection test failed:', error);
+    if (error instanceof TypeError && error.message.includes('CORS')) {
+      console.error('🚫 CORS Error: Backend is not allowing requests from this domain');
+    }
     return false;
   }
 }
@@ -40,7 +53,10 @@ export async function httpGet<T>(path: string): Promise<T> {
   try {
     console.log(`🔄 GET ${API_BASE_URL}${path}`);
     const res = await fetch(`${API_BASE_URL}${path}`, { 
-      headers: { ...authHeaders() },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...authHeaders() 
+      },
       mode: 'cors',
       credentials: 'omit'
     });
@@ -52,6 +68,9 @@ export async function httpGet<T>(path: string): Promise<T> {
     return res.json();
   } catch (error) {
     console.error(`❌ GET ${path} error:`, error);
+    if (error instanceof TypeError && error.message.includes('CORS')) {
+      console.error('🚫 CORS Error: Check backend CORS configuration for this domain');
+    }
     throw error;
   }
 }
@@ -61,7 +80,10 @@ export async function httpPost<T>(path: string, body: unknown): Promise<T> {
     console.log(`🔄 POST ${API_BASE_URL}${path}`, body);
     const res = await fetch(`${API_BASE_URL}${path}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      headers: { 
+        'Content-Type': 'application/json', 
+        ...authHeaders() 
+      },
       body: JSON.stringify(body),
       mode: 'cors',
       credentials: 'omit'
@@ -74,6 +96,9 @@ export async function httpPost<T>(path: string, body: unknown): Promise<T> {
     return res.json();
   } catch (error) {
     console.error(`❌ POST ${path} error:`, error);
+    if (error instanceof TypeError && error.message.includes('CORS')) {
+      console.error('🚫 CORS Error: Check backend CORS configuration for this domain');
+    }
     throw error;
   }
 }
