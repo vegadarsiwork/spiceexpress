@@ -24,7 +24,7 @@ function PrivateRoute({ children, roles }: { children: React.ReactElement, roles
   if (!libIsAuthed()) return <Navigate to="/login" replace />;
   const user = getUserFromStorage();
   if (roles && user && !roles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
   return children;
 }

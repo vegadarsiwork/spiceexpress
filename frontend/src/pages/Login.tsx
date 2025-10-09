@@ -8,7 +8,7 @@ export default function Login() {
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [navigate]);
   const [email, setEmail] = useState('')
@@ -53,7 +53,7 @@ export default function Login() {
         if (json.user) {
           localStorage.setItem('user', JSON.stringify(json.user));
         }
-        window.location.href = '/'
+        navigate('/dashboard', { replace: true })
       } else {
         console.log('📝 Attempting register to:', `${API_BASE_URL}/auth/register`);
         const res = await fetch(`${API_BASE_URL}/auth/register`, {

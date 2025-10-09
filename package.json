@@ -1,19 +1,4 @@
 {
-  "name": "spiceexpress-root",
-  "version": "1.0.0",
-  "description": "SpiceExpress Logistics Platform - Root configuration for Azure deployment",
-  "scripts": {
-    "start": "cd backend && npm start",
-    "build": "cd backend && npm install",
-    "azure:build": "cd backend && npm install --production",
-    "postinstall": "cd backend && npm install"
-  },
-  "engines": {
-    "node": "20.x",
-    "npm": "10.x"
-  },
-  "author": "VegaDarsi",
-  "license": "MIT",
   "dependencies": {
     "framer-motion": "^12.23.12",
     "gsap": "^3.13.0",

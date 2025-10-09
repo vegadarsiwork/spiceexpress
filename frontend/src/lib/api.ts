@@ -1,7 +1,7 @@
 // Get API URL with fallback options
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
   (import.meta.env.PROD 
-    ? 'https://spiceexpress-backend-eab6abf4a7ejhyf2.centralindia-01.azurewebsites.net/api'
+    ? 'https://spiceexpress-backend.onrender.com/api'
     : 'http://localhost:5000/api');
 
 // Debug logging (temporary)
