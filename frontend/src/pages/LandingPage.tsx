@@ -162,33 +162,55 @@ const LandingPage = () => {
           </div>
         </nav>
       ) : (
-        <nav className="fixed left-1/2 -translate-x-1/2 top-4 z-40 w-[95%] max-w-6xl bg-white/80 backdrop-blur-md shadow-lg rounded-lg px-4 md:px-6 py-3 md:py-4 border border-gray-100 transition-[transform,opacity] duration-300">
-          <div className="flex items-center justify-between w-full gap-4 flex-nowrap">
-            <div className="flex items-center gap-2 flex-none">
-              <img src="/logo.png" alt="Spice Express Logo" className="w-8 h-8 rounded-full transition-all duration-300" />
-              <span className="font-bold text-base text-red-700">Spice Express</span>
+        <>
+          <nav className={isMobile ? "sticky top-0 z-50 w-full bg-white border-b border-gray-100" : "fixed left-1/2 -translate-x-1/2 top-4 z-40 w-[95%] max-w-6xl bg-white/80 backdrop-blur-md shadow-lg rounded-lg border border-gray-100 transition-[transform,opacity] duration-300"}>
+            <div className={isMobile ? "px-4 py-3 flex items-center justify-between" : "px-4 md:px-6 py-3 md:py-4 flex items-center justify-between w-full gap-4 flex-nowrap"}>
+              <div className="flex items-center gap-2 flex-none">
+                <img src="/logo.png" alt="Spice Express Logo" className="w-8 h-8 rounded-full transition-all duration-300" />
+                <span className="font-bold text-base text-red-700">Spice Express</span>
+              </div>
+              <div className="hidden md:flex items-center gap-6 text-gray-800 font-medium flex-row flex-nowrap whitespace-nowrap">
+                <a href="#" className="hover:text-red-600">Home</a>
+                <a href="#about" className="hover:text-red-600">About</a>
+                <a href="#services" className="hover:text-red-600">Services</a>
+                <a href="#contact" className="hover:text-red-600">Contact</a>
+              </div>
+              <div className="hidden md:flex items-center flex-none">
+                <a 
+                  href={isLoggedIn ? "/dashboard" : "/login"} 
+                  className="px-8 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700"
+                >
+                  {isLoggedIn ? "Go to Dashboard" : "Login"}
+                </a>
+              </div>
+              <div className="md:hidden flex items-center">
+                <button aria-label="Toggle menu" onClick={() => setMobileMenuOpen(v => !v)} className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600">
+                  <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
+                </button>
+              </div>
             </div>
-            <div className="hidden md:flex items-center gap-6 text-gray-800 font-medium flex-row flex-nowrap whitespace-nowrap">
-              <a href="#" className="hover:text-red-600">Home</a>
-              <a href="#about" className="hover:text-red-600">About</a>
-              <a href="#services" className="hover:text-red-600">Services</a>
-              <a href="#contact" className="hover:text-red-600">Contact</a>
+          </nav>
+          
+          {/* Mobile nav panel - outside of ScrollReveal for proper positioning */}
+          {mobileMenuOpen && isMobile && (
+            <div className="sticky top-[60px] z-40 bg-white border-b border-gray-200 px-4 py-4 shadow-lg">
+              <div className="flex flex-col gap-3">
+                <a href="#" className="text-gray-800 font-medium py-2 hover:text-red-600">Home</a>
+                <a href="#about" className="text-gray-800 font-medium py-2 hover:text-red-600">About</a>
+                <a href="#services" className="text-gray-800 font-medium py-2 hover:text-red-600">Services</a>
+                <a href="#contact" className="text-gray-800 font-medium py-2 hover:text-red-600">Contact</a>
+                <div className="pt-2 border-t border-gray-200">
+                  <a 
+                    href={isLoggedIn ? "/dashboard" : "/login"} 
+                    className="w-full text-center px-4 py-3 rounded bg-red-600 text-white font-semibold block hover:bg-red-700"
+                  >
+                    {isLoggedIn ? "Go to Dashboard" : "Login"}
+                  </a>
+                </div>
+              </div>
             </div>
-            <div className="hidden md:flex items-center flex-none">
-              <a 
-                href={isLoggedIn ? "/dashboard" : "/login"} 
-                className="px-8 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700"
-              >
-                {isLoggedIn ? "Go to Dashboard" : "Login"}
-              </a>
-            </div>
-            <div className="md:hidden flex items-center">
-              <button aria-label="Toggle menu" onClick={() => setMobileMenuOpen(v => !v)} className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600">
-                <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={mobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
-              </button>
-            </div>
-          </div>
-        </nav>
+          )}
+        </>
       )}
       
   {/* spacer: fixed height equal to the largest navbar height to avoid page jump */}
@@ -277,25 +299,6 @@ const LandingPage = () => {
           </div>
           </div>
         </section>
-        {/* Mobile nav panel */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
-            <div className="flex flex-col gap-3">
-              <a href="#" className="text-gray-800 font-medium">Home</a>
-              <a href="#about" className="text-gray-800 font-medium">About</a>
-              <a href="#services" className="text-gray-800 font-medium">Services</a>
-              <a href="#contact" className="text-gray-800 font-medium">Contact</a>
-              <div className="pt-2">
-                <a 
-                  href={isLoggedIn ? "/dashboard" : "/login"} 
-                  className="w-full text-center px-3 py-2 rounded bg-red-600 text-white font-semibold block"
-                >
-                  {isLoggedIn ? "Go to Dashboard" : "Login"}
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
       </ScrollReveal>
       {/* Instant Rate Modal */}
       <Modal open={instantModalOpen} onClose={() => setInstantModalOpen(false)}>
