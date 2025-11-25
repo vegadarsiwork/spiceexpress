@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
-import Cursor from '../components/Cursor';
 import ScrollReveal from '../components/ScrollReveal';
 import Modal from '../components/Modal';
 import TrackingLight from '../components/TrackingLight';
 import TrustBadges from '../components/TrustBadges';
-import ClientLogos from '../components/ClientLogos';
 import AboutStats from '../components/AboutStats';
 import Carousel from '../components/Carousel';
 import { Train, Truck, Shield, Settings, Users, Check } from 'lucide-react';
 import { isAuthed } from '../lib/auth';
-import { useCountUp, useRotatingText } from '../lib/animations';
+import { useRotatingText } from '../lib/animations';
 
 const LandingPage = () => {
   const [trackingOpen, setTrackingOpen] = useState(false);
