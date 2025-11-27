@@ -23,7 +23,7 @@ const LandingPage = () => {
   // Hero carousel auto-rotation
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 4);
+      setCurrentSlide((prev) => (prev + 1) % 6);
     }, 5000);
 
     return () => clearInterval(timer);
@@ -136,25 +136,25 @@ const LandingPage = () => {
     const onScroll = () => {
       setScrolled(window.scrollY > 24);
       
-      // Track active section
+      // Track active section based on viewport center
       const sections = ['home', 'about', 'services', 'contact'];
-      const scrollPosition = window.scrollY + window.innerHeight / 3;
-      const isNearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
+      const viewportCenter = window.scrollY + window.innerHeight / 2;
       
       let currentSection = 'home';
+      let minDistance = Infinity;
       
-      // If near bottom, always show contact
-      if (isNearBottom) {
-        currentSection = 'contact';
-      } else {
-        for (const section of sections) {
-          const element = document.getElementById(section);
-          if (element) {
-            const offsetTop = (element as HTMLElement).offsetTop;
-            
-            if (scrollPosition >= offsetTop) {
-              currentSection = section;
-            }
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const elementTop = window.scrollY + rect.top;
+          const elementCenter = elementTop + rect.height / 2;
+          const distance = Math.abs(viewportCenter - elementCenter);
+          
+          // Find the section whose center is closest to viewport center
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentSection = section;
           }
         }
       }
@@ -281,15 +281,17 @@ const LandingPage = () => {
 
       {/* Hero Section - Carousel as Background */ }
       <ScrollReveal y={isMobile ? 0 : 60} scale={isMobile ? 1 : 0.96}>
-        <section id="home" className="w-full min-h-[90vh] flex flex-col items-center relative overflow-hidden">
+        <section id="home" className="w-full min-h-[95vh] flex flex-col items-center relative overflow-hidden">
           {/* Carousel Background - Full Screen */}
           <div className="absolute inset-0 w-full h-full">
             <div className="relative w-full h-full">
               {[
-                '/train main page image.jpg',
-                '/train main page image 2.jpg',
+                '/train main page image 1.jpg',
+                '/train main page image 2.jpeg',
                 '/train main page image 3.jpg',
-                '/train main page image 4.jpg'
+                '/train main page image 4.jpg',
+                '/train main page image 5.jpg',
+                '/train main page image 6.jpg'
               ].map((image, index) => (
                 <div
                   key={index}
@@ -412,8 +414,8 @@ const LandingPage = () => {
         <div className="flex justify-center mb-8">
           <Carousel
             images={[
-              '/handling cargo 1.jpeg',
-              '/handling cargo 3.jpg',
+              '/handling cargo 1.jpg',
+              '/safe handling of material 1.jpg',
               '/handling cargo 4.jpg'
             ]}
             autoPlay={true}
@@ -520,7 +522,7 @@ const LandingPage = () => {
           <div className="bg-white rounded-2xl shadow-lg p-6 card-hover">
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Door-to-Door Service</h3>
             <div className="mb-4 rounded-2xl overflow-hidden h-64">
-              <img src="/door pick up door delivery.jpg" alt="Door to Door Delivery" className="w-full h-full object-cover" />
+              <img src="/door pickup and delivery 1.jpg" alt="Door to Door Delivery" className="w-full h-full object-cover" />
             </div>
             <p className="text-gray-700">Complete pickup and delivery services ensuring your cargo reaches its destination without hassle.</p>
           </div>
@@ -545,7 +547,7 @@ const LandingPage = () => {
           <div className="bg-white rounded-2xl shadow-lg p-6 card-hover">
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Customized Solutions</h3>
             <div className="mb-4 rounded-2xl overflow-hidden h-64">
-              <img src="/customised solutions for your transportation needs 1.jpg" alt="Customized Solutions" className="w-full h-full object-cover" />
+              <img src="/customised solutions for your transportation needs.jpg" alt="Customized Solutions" className="w-full h-full object-cover" />
             </div>
             <p className="text-gray-700">Tailored logistics solutions designed to meet your unique business requirements and challenges.</p>
           </div>
@@ -565,7 +567,15 @@ const LandingPage = () => {
               </ul>
             </div>
             <div className="rounded-2xl overflow-hidden shadow-xl">
-              <img src="/timely POD updation on portal.jpg" alt="POD Portal Updates" className="w-full h-80 object-cover" />
+              <Carousel
+                images={[
+                  '/proof of delivery updation 1.jpg',
+                  '/proof of delivery updation 2.jpg'
+                ]}
+                autoPlay={true}
+                interval={4000}
+                aspectRatio="h-80"
+              />
             </div>
           </div>
         </div>
