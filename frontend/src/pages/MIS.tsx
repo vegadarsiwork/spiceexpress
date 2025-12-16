@@ -67,6 +67,61 @@ export default function MIS() {
               </ShadButton>
             ))}
           </div>
+          {/* Download Buttons */}
+          {selectedCustomer && (
+            <div className="flex gap-2 mt-2 md:mt-0 md:ml-4">
+              <ShadButton
+                className="bg-green-600 hover:bg-green-700 text-white"
+                style={{ borderRadius: '0.75rem', fontWeight: 600, padding: '0.5rem 1.25rem' }}
+                onClick={async () => {
+                  const token = localStorage.getItem('auth_token');
+                  const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+                  try {
+                    const res = await fetch(misApi.downloadExcel(selectedCustomer), { headers, credentials: 'omit' });
+                    if (!res.ok) throw new Error('Download failed');
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `MIS_${selectedCustomer}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                  } catch (err) {
+                    alert('Failed to download Excel');
+                  }
+                }}
+              >
+                📊 Excel
+              </ShadButton>
+              <ShadButton
+                className="bg-red-600 hover:bg-red-700 text-white"
+                style={{ borderRadius: '0.75rem', fontWeight: 600, padding: '0.5rem 1.25rem' }}
+                onClick={async () => {
+                  const token = localStorage.getItem('auth_token');
+                  const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+                  try {
+                    const res = await fetch(misApi.downloadPdf(selectedCustomer), { headers, credentials: 'omit' });
+                    if (!res.ok) throw new Error('Download failed');
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `MIS_${selectedCustomer}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                  } catch (err) {
+                    alert('Failed to download PDF');
+                  }
+                }}
+              >
+                📄 PDF
+              </ShadButton>
+            </div>
+          )}
         </div>
       </div>
       {loading && <div className="text-gray-500 dark:text-gray-400">Loading...</div>}
@@ -92,7 +147,7 @@ export default function MIS() {
               </ShadCard>
               <ShadCard className="p-8 bg-gradient-to-br from-purple-100 to-purple-300 dark:from-purple-900 dark:to-purple-700 rounded-2xl shadow-lg">
                 <div className="text-purple-700 dark:text-purple-200 text-sm font-semibold mb-2">Customer</div>
-                <div className="text-4xl font-extrabold text-purple-900 dark:text-purple-100 mb-1">{summary.customer?.name || '-'}</div>
+                <div className="text-4xl font-extrabold text-purple-900 dark:text-purple-100 mb-1">{summary.customer?.company || summary.customer?.name || '-'}</div>
                 <div className="text-sm text-purple-800 dark:text-purple-300">{summary.customer?.email || ''}</div>
               </ShadCard>
             </div>
@@ -111,13 +166,13 @@ export default function MIS() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(summary.recentLRs || []).map((lr: any) => (
+                  {(summary.lrs || []).slice(0, 10).map((lr: any) => (
                     <tr key={lr._id} className="border-b border-gray-50 dark:border-gray-800">
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{lr.lrNumber}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{new Date(lr.bookingDate || lr.date).toLocaleDateString()}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{new Date(lr.bookingDate).toLocaleDateString()}</td>
                       <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{lr.consignor?.city || '-'}</td>
                       <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{lr.consignee?.city || '-'}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{lr.charges?.grandTotal?.toLocaleString() || 'N/A'}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{lr.charges?.total?.toLocaleString() || 'N/A'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -160,10 +215,10 @@ export default function MIS() {
                   {(summary.lrs || []).map((lr: any) => (
                     <tr key={lr._id} className="border-b border-gray-50 dark:border-gray-800">
                       <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{lr.lrNumber}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{new Date(lr.date).toLocaleDateString()}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{lr.origin}</td>
-                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{lr.destination}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{lr.amount?.toLocaleString() || 'N/A'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{new Date(lr.bookingDate).toLocaleDateString()}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{lr.consignor?.city || '-'}</td>
+                      <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{lr.consignee?.city || '-'}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{lr.charges?.total?.toLocaleString() || 'N/A'}</td>
                     </tr>
                   ))}
                 </tbody>

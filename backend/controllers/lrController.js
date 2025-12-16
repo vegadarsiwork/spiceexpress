@@ -31,12 +31,12 @@ export const createLR = async (req, res) => {
       email: body.consignee?.email || '',
       gstin: body.consignee?.gstin || ''
     };
-    // Shipment Details
+    // Shipment Details - read from nested structure sent by frontend
     const shipmentDetails = {
-      numberOfArticles: body.numberOfArticles,
-      actualWeight: body.actualWeight,
-      chargedWeight: body.chargedWeight,
-      descriptionOfGoods: body.descriptionOfGoods
+      numberOfArticles: body.shipmentDetails?.numberOfArticles ?? body.numberOfArticles,
+      actualWeight: body.shipmentDetails?.actualWeight ?? body.actualWeight,
+      chargedWeight: body.shipmentDetails?.chargedWeight ?? body.chargedWeight,
+      descriptionOfGoods: body.shipmentDetails?.descriptionOfGoods ?? body.descriptionOfGoods
     };
     // Charges
     const charges = {
@@ -163,11 +163,23 @@ export const downloadLR = async (req, res) => {
     const __dirname = path.dirname(__filename);
     const templatePath = path.resolve(__dirname, '../views/lr-template.ejs');
 
+    // Read logo and convert to base64 for embedding
+    const fs = await import('fs');
+    const logoPath = path.resolve(__dirname, '../public/uploads/logos/spice-logo.png');
+    let logoBase64 = '';
+    try {
+      const logoBuffer = fs.readFileSync(logoPath);
+      logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+    } catch (e) {
+      console.warn('Could not load logo:', e.message);
+    }
+
     const html = await ejs.renderFile(templatePath, {
       lr,
+      logoBase64,
     });
 
-    const browser = await puppeteer.launch(); 
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     const pdfBuffer = await page.pdf({ format: 'A4' });

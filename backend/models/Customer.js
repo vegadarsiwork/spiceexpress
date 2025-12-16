@@ -9,7 +9,7 @@ const laneRateSchema = new mongoose.Schema({
 
 const customerSchema = new mongoose.Schema({
   code: { type: String, required: true },
-  name: { type: String, required: true },
+  name: { type: String }, // Optional - will default to company if not provided
   company: String,
   address: String,
   state: String,

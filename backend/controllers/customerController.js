@@ -38,8 +38,10 @@ export const createCustomer = async (req, res) => {
     const {
       code, name, company, address, state, city, pin, phone, fax, email, hsnCode, cftRatio, gst1, gstin, pan, bankName, accountNo, micr, ifsc
     } = req.body;
+    // Auto-set name from company if not provided
+    const customerName = name || company || code;
     const customer = await Customer.create({
-      code, name, company, address, state, city, pin, phone, fax, email, hsnCode, cftRatio, gst1, gstin, pan, bankName, accountNo, micr, ifsc
+      code, name: customerName, company, address, state, city, pin, phone, fax, email, hsnCode, cftRatio, gst1, gstin, pan, bankName, accountNo, micr, ifsc
     });
     res.status(201).json(customer);
   } catch (err) {
@@ -67,13 +69,13 @@ export const getCustomerSummary = async (req, res) => {
         {
           $group: {
             _id: null,
-            totalBusiness: { $sum: '$charges.grandTotal' },
+            totalBusiness: { $sum: '$charges.total' }, // Fixed: was grandTotal
             lrCount: { $sum: 1 },
           },
         },
       ]),
       Invoice.aggregate([
-        { $match: { customer: customerId, status: 'unpaid' } },
+        { $match: { customerCode: customer.code, status: 'unpaid' } }, // Fixed: use customerCode string
         { $group: { _id: null, totalUnpaid: { $sum: '$totalAmount' } } },
       ]),
       LR.find({ customer: customerId })

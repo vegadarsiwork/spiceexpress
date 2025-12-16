@@ -245,33 +245,118 @@ export default function LRDetailsPage() {
       </div>
 
       <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
-        <div className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-200">Shipment Info</div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">Shipment Info</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Description of Goods</div>
-            <div className="text-xl font-mono text-blue-700 dark:text-blue-300 mt-1">{lr.shipmentDetails?.descriptionOfGoods || 'Not specified'}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Booking Date</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{lr.bookingDate ? new Date(lr.bookingDate).toLocaleDateString('en-IN') : 'N/A'}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Total Weight</div>
-            <div className="text-xl font-bold text-blue-700 dark:text-blue-200 mt-1">{lr.shipmentDetails?.actualWeight ?? 'N/A'} kg</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Payment Type</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{lr.charges?.paymentType || 'Billed'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Dispatch Branch</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{(lr as any).dispatchBranch || 'N/A'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">E-Way Bill No</div>
+            <div className="text-base font-semibold text-blue-700 dark:text-blue-300 mt-1">{(lr as any).ewayBillNumber || 'N/A'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Vehicle Number</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{(lr as any).vehicleNumber || 'N/A'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Driver Name</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{(lr as any).driverName || 'N/A'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">No. of Packages</div>
+            <div className="text-base font-bold text-blue-700 dark:text-blue-200 mt-1">{lr.shipmentDetails?.numberOfArticles ?? 'N/A'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Actual Weight (Kg)</div>
+            <div className="text-base font-bold text-blue-700 dark:text-blue-200 mt-1">{lr.shipmentDetails?.actualWeight ?? 'N/A'}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Charged Weight (Kg)</div>
+            <div className="text-base font-bold text-blue-700 dark:text-blue-200 mt-1">{lr.shipmentDetails?.chargedWeight ?? 'N/A'}</div>
+          </div>
+          <div className="sm:col-span-2 lg:col-span-3">
+            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Description of Goods</div>
+            <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{lr.shipmentDetails?.descriptionOfGoods || 'Not specified'}</div>
           </div>
         </div>
+
+        {/* Customer Invoice Details */}
+        {((lr as any).customerInvoice?.number || (lr as any).customerInvoice?.value) && (
+          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Customer Invoice Details</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Invoice Number</div>
+                <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{(lr as any).customerInvoice?.number || 'N/A'}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Invoice Date</div>
+                <div className="text-base font-semibold text-gray-900 dark:text-white mt-1">{(lr as any).customerInvoice?.date ? new Date((lr as any).customerInvoice.date).toLocaleDateString('en-IN') : 'N/A'}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">Invoice Value</div>
+                <div className="text-base font-bold text-green-600 dark:text-green-400 mt-1">₹ {(lr as any).customerInvoice?.value?.toLocaleString('en-IN') || 'N/A'}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
-          <div className="mb-2 text-base font-semibold text-gray-800 dark:text-gray-300">Consignor (Sender)</div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">{lr.consignor?.name}</div>
-            <div className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-line">{lr.consignor?.address}{lr.consignor?.city ? ', ' + lr.consignor?.city : ''}</div>
+          <div className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-300">Consignor (Sender)</div>
+          <div className="space-y-2">
+            <div className="text-lg font-bold text-gray-900 dark:text-white">{lr.consignor?.name || 'N/A'}</div>
+            <div className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-line">
+              {lr.consignor?.address || ''}
+              {lr.consignor?.city ? `, ${lr.consignor.city}` : ''}
+              {lr.consignor?.state ? `, ${lr.consignor.state}` : ''}
+              {lr.consignor?.pin ? ` - ${lr.consignor.pin}` : ''}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-2">
+              {lr.consignor?.phone && (
+                <div><span className="text-gray-500 dark:text-gray-400">Phone:</span> <span className="text-gray-900 dark:text-white">{lr.consignor.phone}</span></div>
+              )}
+              {lr.consignor?.email && (
+                <div><span className="text-gray-500 dark:text-gray-400">Email:</span> <span className="text-gray-900 dark:text-white">{lr.consignor.email}</span></div>
+              )}
+              {lr.consignor?.gstin && (
+                <div><span className="text-gray-500 dark:text-gray-400">GSTIN:</span> <span className="text-blue-600 dark:text-blue-400 font-mono">{lr.consignor.gstin}</span></div>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
-          <div className="mb-2 text-base font-semibold text-gray-800 dark:text-gray-300">Consignee (Receiver)</div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-gray-900 dark:text-white">{lr.consignee?.name}</div>
-            <div className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-line">{lr.consignee?.address}{lr.consignee?.city ? ', ' + lr.consignee?.city : ''}</div>
+          <div className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-300">Consignee (Receiver)</div>
+          <div className="space-y-2">
+            <div className="text-lg font-bold text-gray-900 dark:text-white">{lr.consignee?.name || 'N/A'}</div>
+            <div className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-line">
+              {lr.consignee?.address || ''}
+              {lr.consignee?.city ? `, ${lr.consignee.city}` : ''}
+              {lr.consignee?.state ? `, ${lr.consignee.state}` : ''}
+              {lr.consignee?.pin ? ` - ${lr.consignee.pin}` : ''}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm mt-2">
+              {lr.consignee?.phone && (
+                <div><span className="text-gray-500 dark:text-gray-400">Phone:</span> <span className="text-gray-900 dark:text-white">{lr.consignee.phone}</span></div>
+              )}
+              {lr.consignee?.email && (
+                <div><span className="text-gray-500 dark:text-gray-400">Email:</span> <span className="text-gray-900 dark:text-white">{lr.consignee.email}</span></div>
+              )}
+              {lr.consignee?.gstin && (
+                <div><span className="text-gray-500 dark:text-gray-400">GSTIN:</span> <span className="text-blue-600 dark:text-blue-400 font-mono">{lr.consignee.gstin}</span></div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -282,44 +367,64 @@ export default function LRDetailsPage() {
           {lr.charges && (
             <>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                <span className="text-gray-600 dark:text-gray-400">Freight</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.freight ?? 'N/A'}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                <span className="text-gray-600 dark:text-gray-400">Pickup Charge</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.pickupCharge ?? 'N/A'}</span>
-              </div>
-              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                <span className="text-gray-600 dark:text-gray-400">Door Delivery Charge</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.doorDeliveryCharge ?? 'N/A'}</span>
+                <span className="text-gray-600 dark:text-gray-400">Base Freight</span>
+                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.freight?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
                 <span className="text-gray-600 dark:text-gray-400">Docket Charge</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.docketCharge ?? 'N/A'}</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.docketCharge?.toLocaleString('en-IN') ?? '0'}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                <span className="text-gray-600 dark:text-gray-400">Pickup Charge</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.pickupCharge?.toLocaleString('en-IN') ?? '0'}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                <span className="text-gray-600 dark:text-gray-400">Door Delivery Charge</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.doorDeliveryCharge?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
                 <span className="text-gray-600 dark:text-gray-400">Handling Charge</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.handlingCharge ?? 'N/A'}</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.handlingCharge?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
                 <span className="text-gray-600 dark:text-gray-400">Transhipment Charge</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.transhipmentCharge ?? 'N/A'}</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.transhipmentCharge?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                <span className="text-gray-600 dark:text-gray-400">Other</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.other ?? 'N/A'}</span>
+                <span className="text-gray-600 dark:text-gray-400">Insurance</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {(lr.charges as any).insurance?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.subTotal ?? 'N/A'}</span>
+                <span className="text-gray-600 dark:text-gray-400">Fuel Surcharge</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {(lr.charges as any).fuelSurcharge?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
               <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
-                <span className="text-gray-600 dark:text-gray-400">GST Charge</span>
-                <span className="font-bold text-blue-700 dark:text-blue-200 text-lg">₹ {lr.charges.gstCharge ?? 'N/A'}</span>
+                <span className="text-gray-600 dark:text-gray-400">Carrier Risk</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {(lr.charges as any).carrierRisk?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
-              <div className="flex justify-between pt-2">
-                <span className="text-gray-800 dark:text-gray-300 font-semibold">Total</span>
-                <span className="text-gray-900 dark:text-white font-extrabold text-xl">₹ {lr.charges.total ?? 'N/A'}</span>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                <span className="text-gray-600 dark:text-gray-400">Owner Risk</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {(lr.charges as any).ownerRisk?.toLocaleString('en-IN') ?? '0'}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                <span className="text-gray-600 dark:text-gray-400">Commission</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {(lr.charges as any).commission?.toLocaleString('en-IN') ?? '0'}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                <span className="text-gray-600 dark:text-gray-400">Other Charges</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.other?.toLocaleString('en-IN') ?? '0'}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2 bg-gray-50 dark:bg-gray-800 px-2 -mx-2 rounded">
+                <span className="text-gray-700 dark:text-gray-300 font-semibold">Subtotal (Pre-Tax)</span>
+                <span className="font-bold text-gray-900 dark:text-white">₹ {(lr.charges as any).subTotal?.toLocaleString('en-IN') ?? ((lr.charges.freight || 0) + (lr.charges.docketCharge || 0) + (lr.charges.pickupCharge || 0) + (lr.charges.doorDeliveryCharge || 0) + (lr.charges.handlingCharge || 0) + (lr.charges.transhipmentCharge || 0) + ((lr.charges as any).insurance || 0) + ((lr.charges as any).fuelSurcharge || 0) + (lr.charges.other || 0)).toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+                <span className="text-gray-600 dark:text-gray-400">GST</span>
+                <span className="font-bold text-blue-700 dark:text-blue-200">₹ {lr.charges.gstCharge?.toLocaleString('en-IN') ?? '0'}</span>
+              </div>
+              <div className="flex justify-between pt-3 bg-blue-50 dark:bg-blue-900/30 px-3 -mx-2 py-2 rounded-lg">
+                <span className="text-gray-900 dark:text-white font-bold text-lg">Grand Total</span>
+                <span className="text-blue-700 dark:text-blue-300 font-extrabold text-xl">₹ {lr.charges.total?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
             </>
           )}

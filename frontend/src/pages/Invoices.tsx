@@ -18,10 +18,10 @@ export default function Invoices() {
     const token = localStorage.getItem('auth_token');
     const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
     console.log('Download Invoice Debug:', { token, headers, url: invoiceApi.download(id) });
-  const res = await fetch(invoiceApi.download(id), { headers, credentials: 'include' });
+    const res = await fetch(invoiceApi.download(id), { headers, credentials: 'omit' });
     if (!res.ok) {
       let errText = '';
-      try { errText = await res.text(); } catch {}
+      try { errText = await res.text(); } catch { }
       console.error('Invoice download error:', res.status, errText);
       alert(`Failed to download invoice. Status: ${res.status}\n${errText}`);
       return;
@@ -36,6 +36,26 @@ export default function Invoices() {
     a.remove();
     window.URL.revokeObjectURL(url);
   }
+  async function downloadAnnexure(id: string) {
+    const token = localStorage.getItem('auth_token');
+    const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(invoiceApi.annexure(id), { headers, credentials: 'omit' });
+    if (!res.ok) {
+      let errText = '';
+      try { errText = await res.text(); } catch { }
+      alert(`Failed to download annexure. Status: ${res.status}\n${errText}`);
+      return;
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoice-annexure-${id}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -44,7 +64,8 @@ export default function Invoices() {
     customerCode: '',
     lrList: [],
     invoiceNo: '',
-    invoiceDate: new Date().toISOString().slice(0,10),
+    invoiceDate: new Date().toISOString().slice(0, 10),
+    companyCode: '11', // Default to SPICE EXPRESS
     gstPercent: 0
   })
   const [customers, setCustomers] = useState<any[]>([])
@@ -55,9 +76,9 @@ export default function Invoices() {
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const filteredCustomers = customerSearch
     ? customers.filter(c =>
-        c.company?.toLowerCase().includes(customerSearch.toLowerCase()) ||
-        c.code?.toLowerCase().includes(customerSearch.toLowerCase())
-      )
+      c.company?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+      c.code?.toLowerCase().includes(customerSearch.toLowerCase())
+    )
     : customers;
   const user = (() => {
     try {
@@ -100,24 +121,24 @@ export default function Invoices() {
 
   useEffect(() => {
     loadInvoices()
-  loadAvailableLrs()
-  loadCustomers()
+    loadAvailableLrs()
+    loadCustomers()
   }, [])
 
   async function createInvoice(e: React.FormEvent) {
     e.preventDefault();
     if (!user || user.role !== 'admin') return;
-  if (!selectedCustomerId) return;
-  if (formData.lrList.length === 0) return;
+    if (!selectedCustomerId) return;
+    if (formData.lrList.length === 0) return;
 
     setSubmitting(true);
     setError(null);
     try {
-  // compute totals server-side, but provide freight and gst for convenience
+      // compute totals server-side, but provide freight and gst for convenience
       // compute basic freight from selected LRs
       const selectedCustomer = customers.find(c => c._id === selectedCustomerId)
       const selectedLrs = availableLrs.filter(lr => formData.lrList.includes(lr._id))
-      const basicFreight = selectedLrs.reduce((s:any, lr:any) => s + (Number(lr.amount || 0)), 0)
+      const basicFreight = selectedLrs.reduce((s: any, lr: any) => s + (Number(lr.amount || 0)), 0)
       const payload = {
         invoiceNo: formData.invoiceNo,
         invoiceDate: formData.invoiceDate,
@@ -128,7 +149,7 @@ export default function Invoices() {
       }
       await invoiceApi.create(payload);
       setFormData({ customerCode: '', lrList: [] });
-  setFormData({ customerCode: '', lrList: [], invoiceNo: '', invoiceDate: new Date().toISOString().slice(0,10), freightValue: 0, gstPercent: 0 })
+      setFormData({ customerCode: '', lrList: [], invoiceNo: '', invoiceDate: new Date().toISOString().slice(0, 10), freightValue: 0, gstPercent: 0 })
       await loadInvoices();
     } catch (err: any) {
       setError(err.message || 'Failed to create invoice');
@@ -147,17 +168,17 @@ export default function Invoices() {
   // Filter LRs by customer ObjectId for robust linkage
   const lrsForSelectedCustomer = selectedCustomerId
     ? availableLrs
-        .filter(lr => String(lr.customer) === String(selectedCustomerId))
-        .sort((a, b) => {
-          const dateA = new Date(a.date || a.bookingDate || 0).getTime();
-          const dateB = new Date(b.date || b.bookingDate || 0).getTime();
-          return dateB - dateA;
-        })
+      .filter(lr => String(lr.customer) === String(selectedCustomerId))
+      .sort((a, b) => {
+        const dateA = new Date(a.date || a.bookingDate || 0).getTime();
+        const dateB = new Date(b.date || b.bookingDate || 0).getTime();
+        return dateB - dateA;
+      })
     : []
 
   const selectedLrObjects = availableLrs.filter(lr => formData.lrList.includes(lr._id))
-  const computedBasicFreight = selectedLrObjects.reduce((s:any, lr:any) => s + (lr.charges?.freight || 0), 0)
-  const computedTotal = selectedLrObjects.reduce((s:any, lr:any) => s + (lr.charges?.total || 0), 0)
+  const computedBasicFreight = selectedLrObjects.reduce((s: any, lr: any) => s + (lr.charges?.freight || 0), 0)
+  const computedTotal = selectedLrObjects.reduce((s: any, lr: any) => s + (lr.charges?.total || 0), 0)
 
   if (loading) {
     return (
@@ -188,7 +209,7 @@ export default function Invoices() {
             <form onSubmit={createInvoice} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Code (e.g. 11 or 12)</ShadLabel>
-                <Input placeholder="11" value={codeInput} onChange={(e)=>{ setCodeInput(e.target.value); }} />
+                <Input placeholder="11" value={codeInput} onChange={(e) => { setCodeInput(e.target.value); }} />
               </div>
               <div className="relative">
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Customer</ShadLabel>
@@ -225,11 +246,22 @@ export default function Invoices() {
               </div>
               <div>
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Invoice No</ShadLabel>
-                <Input placeholder="Leave blank for auto generate" value={formData.invoiceNo} onChange={(e)=>handleInputChange('invoiceNo', e.target.value)} />
+                <Input placeholder="Leave blank for auto generate" value={formData.invoiceNo} onChange={(e) => handleInputChange('invoiceNo', e.target.value)} />
               </div>
               <div>
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Invoice Date</ShadLabel>
-                <Input type="date" value={formData.invoiceDate} onChange={(e)=>handleInputChange('invoiceDate', e.target.value)} />
+                <Input type="date" value={formData.invoiceDate} onChange={(e) => handleInputChange('invoiceDate', e.target.value)} />
+              </div>
+              <div>
+                <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company</ShadLabel>
+                <select
+                  value={formData.companyCode || '11'}
+                  onChange={(e) => handleInputChange('companyCode', e.target.value)}
+                  className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+                >
+                  <option value="11">SPICE EXPRESS</option>
+                  <option value="12">ASIAN TRADES LINK</option>
+                </select>
               </div>
               <div className="md:col-span-2">
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Shipment Info</ShadLabel>
@@ -237,13 +269,13 @@ export default function Invoices() {
                   <table className="min-w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
-                        <th className="px-3 py-2"><input type="checkbox" onChange={(e)=>{
+                        <th className="px-3 py-2"><input type="checkbox" onChange={(e) => {
                           if (!e.target.checked) handleInputChange('lrList', [])
                           else {
                             const ids = lrsForSelectedCustomer.map(l => l._id)
                             handleInputChange('lrList', ids)
                           }
-                        }} checked={lrsForSelectedCustomer.length>0 && lrsForSelectedCustomer.every(l=>formData.lrList.includes(l._id))} /></th>
+                        }} checked={lrsForSelectedCustomer.length > 0 && lrsForSelectedCustomer.every(l => formData.lrList.includes(l._id))} /></th>
                         <th className="px-3 py-2">AWB No</th>
                         <th className="px-3 py-2">Date Time</th>
                         <th className="px-3 py-2">Mode Of Transport</th>
@@ -260,8 +292,8 @@ export default function Invoices() {
                         <tr><td colSpan={10} className="p-4 text-sm text-gray-500">No LRs for selected customer</td></tr>
                       ) : lrsForSelectedCustomer.map(lr => (
                         <tr key={lr._id} className="border-t">
-                          <td className="px-3 py-2"><input type="checkbox" checked={formData.lrList.includes(lr._id)} onChange={(e)=>{
-                            const next = e.target.checked ? [...formData.lrList, lr._id] : formData.lrList.filter(x=>x!==lr._id)
+                          <td className="px-3 py-2"><input type="checkbox" checked={formData.lrList.includes(lr._id)} onChange={(e) => {
+                            const next = e.target.checked ? [...formData.lrList, lr._id] : formData.lrList.filter(x => x !== lr._id)
                             handleInputChange('lrList', next)
                           }} /></td>
                           <td className="px-3 py-2">{lr.lrNumber}</td>
@@ -285,7 +317,7 @@ export default function Invoices() {
               </div>
               <div>
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">GST(%)</ShadLabel>
-                <Input type="number" value={formData.gstPercent} onChange={(e)=>handleInputChange('gstPercent', Number(e.target.value))} />
+                <Input type="number" value={formData.gstPercent} onChange={(e) => handleInputChange('gstPercent', Number(e.target.value))} />
               </div>
               <div className="md:col-span-2">
                 <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
@@ -358,31 +390,38 @@ export default function Invoices() {
                     );
                   })
                   .map(inv => (
-                  <tr key={inv._id} className="border-t text-sm border-gray-100 dark:border-gray-700">
-                    <td className="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">{inv.invoiceNumber}</td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{getCustomerDisplay(inv.customerCode)}</td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{inv.date ? new Date(inv.date).toLocaleDateString() : '-'}</td>
-                    <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{inv.totalAmount?.toLocaleString()}</td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{Array.isArray(inv.lrList) ? inv.lrList.length : 0}</td>
-                    <td className="px-4 py-2">
-                      <a
-                        href={`/invoices/${inv._id}`}
-                        className="inline-flex items-center px-3 py-1.5 rounded bg-green-500 text-white hover:bg-green-600 text-xs font-medium"
-                      >
-                        View Details
-                      </a>
-                    </td>
-                    <td className="px-4 py-2">
-                      <button 
-                        type="button"
-                        onClick={() => downloadInvoice(inv._id)}
-                        className="inline-flex items-center px-3 py-1.5 rounded bg-blue-500 text-white hover:bg-blue-600 text-xs font-medium"
-                      >
-                        Download
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                    <tr key={inv._id} className="border-t text-sm border-gray-100 dark:border-gray-700">
+                      <td className="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">{inv.invoiceNumber}</td>
+                      <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{getCustomerDisplay(inv.customerCode)}</td>
+                      <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{inv.date ? new Date(inv.date).toLocaleDateString() : '-'}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{inv.totalAmount?.toLocaleString()}</td>
+                      <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{Array.isArray(inv.lrList) ? inv.lrList.length : 0}</td>
+                      <td className="px-4 py-2">
+                        <a
+                          href={`/invoices/${inv._id}`}
+                          className="inline-flex items-center px-3 py-1.5 rounded bg-green-500 text-white hover:bg-green-600 text-xs font-medium"
+                        >
+                          View Details
+                        </a>
+                      </td>
+                      <td className="px-4 py-2 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => downloadInvoice(inv._id)}
+                          className="inline-flex items-center px-3 py-1.5 rounded bg-blue-500 text-white hover:bg-blue-600 text-xs font-medium"
+                        >
+                          📄 PDF
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => downloadAnnexure(inv._id)}
+                          className="inline-flex items-center px-3 py-1.5 rounded bg-emerald-500 text-white hover:bg-emerald-600 text-xs font-medium"
+                        >
+                          📊 Annexure
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

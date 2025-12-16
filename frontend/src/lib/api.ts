@@ -1,7 +1,7 @@
 // Get API URL with fallback options
-const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD 
-    ? 'https://spiceexpress-backend.onrender.com/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD
+    ? 'https://spiceexpress-backend.vercel.app/api'
     : 'http://localhost:5000/api');
 
 // Debug logging (temporary)
@@ -49,18 +49,39 @@ function authHeaders(): HeadersInit {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+// Handle 401 responses by clearing auth and redirecting to login
+function handleUnauthorized(response: Response): void {
+  if (response.status === 401) {
+    console.warn('🔐 Unauthorized response detected - clearing auth and redirecting to login');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+
+    // Dispatch auth state change event
+    window.dispatchEvent(new CustomEvent('authStateChanged'));
+
+    // Redirect to login page
+    if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+      window.location.href = '/login';
+    }
+  }
+}
+
 export async function httpGet<T>(path: string): Promise<T> {
   try {
     console.log(`🔄 GET ${API_BASE_URL}${path}`);
-    const res = await fetch(`${API_BASE_URL}${path}`, { 
-      headers: { 
+    const res = await fetch(`${API_BASE_URL}${path}`, {
+      headers: {
         'Content-Type': 'application/json',
-        ...authHeaders() 
+        ...authHeaders()
       },
       mode: 'cors',
       credentials: 'omit'
     });
     console.log(`📊 Response:`, res.status, res.statusText);
+
+    // Handle 401 immediately - redirect to login
+    handleUnauthorized(res);
+
     if (!res.ok) {
       const errorText = await res.text().catch(() => 'Unknown error');
       throw new Error(`GET ${path} failed: ${res.status} ${res.statusText} - ${errorText}`);
@@ -80,15 +101,19 @@ export async function httpPost<T>(path: string, body: unknown): Promise<T> {
     console.log(`🔄 POST ${API_BASE_URL}${path}`, body);
     const res = await fetch(`${API_BASE_URL}${path}`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        ...authHeaders() 
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
       },
       body: JSON.stringify(body),
       mode: 'cors',
       credentials: 'omit'
     });
     console.log(`📊 Response:`, res.status, res.statusText);
+
+    // Handle 401 immediately - redirect to login
+    handleUnauthorized(res);
+
     if (!res.ok) {
       const errorText = await res.text().catch(() => 'Unknown error');
       throw new Error(`POST ${path} failed: ${res.status} ${res.statusText} - ${errorText}`);
@@ -114,6 +139,7 @@ export const lrApi = {
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(data),
   }).then(res => {
+    handleUnauthorized(res);
     if (!res.ok) throw new Error(`PUT /lr/${id} failed: ${res.status}`)
     return res.json()
   }),
@@ -121,6 +147,7 @@ export const lrApi = {
     method: 'DELETE',
     headers: { ...authHeaders() },
   }).then(res => {
+    handleUnauthorized(res);
     if (!res.ok) throw new Error(`DELETE /lr/${id} failed: ${res.status}`)
     return res.json()
   }),
@@ -133,7 +160,8 @@ export const invoiceApi = {
   getAll: () => httpGet<Invoice[]>('/invoice'),
   getById: (id: string) => httpGet<Invoice>(`/invoice/${id}`),
   create: (data: CreateInvoiceData) => httpPost<Invoice>('/invoice', data),
-  download: (id: string) => `${API_BASE_URL}/invoice/${id}/download`
+  download: (id: string) => `${API_BASE_URL}/invoice/${id}/download`,
+  annexure: (id: string) => `${API_BASE_URL}/invoice/${id}/annexure`
 }
 
 // Customer API functions
@@ -147,6 +175,7 @@ export const customerApi = {
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(data),
   }).then(res => {
+    handleUnauthorized(res);
     if (!res.ok) throw new Error(`PUT /customers/${id} failed: ${res.status}`)
     return res.json();
   }),
@@ -154,6 +183,7 @@ export const customerApi = {
     method: 'DELETE',
     headers: { ...authHeaders() },
   }).then(res => {
+    handleUnauthorized(res);
     if (!res.ok) throw new Error(`DELETE /customers/${id} failed: ${res.status}`)
     return res.json();
   })
@@ -168,8 +198,10 @@ export const analyticsApi = {
 }
 
 // MIS API functions
-export const misApi = {   
-  getCustomerMIS: (customerId: string) => httpGet<any>(`/mis/summary/${customerId}`)
+export const misApi = {
+  getCustomerMIS: (customerId: string) => httpGet<any>(`/mis/summary/${customerId}`),
+  downloadExcel: (customerId: string) => `${API_BASE_URL}/mis/export/${customerId}/excel`,
+  downloadPdf: (customerId: string) => `${API_BASE_URL}/mis/export/${customerId}/pdf`,
 }
 
 // Types
@@ -289,9 +321,25 @@ export interface CreateLRData {
 export interface Invoice {
   _id: string
   invoiceNumber: string
+  invoiceNo?: string
+  companyCode?: string // 11=SPICE, 12=ASIAN
   customerCode: string
   lrList: LR[]
   date: string
+  invoiceDate?: string
+  dueDate?: string
+  billingOU?: string
+  supplierName?: string
+  supplierGstin?: string
+  billingAddress?: string
+  poNumber?: string
+  hsn?: string
+  freightValue?: number
+  cgst?: number
+  sgst?: number
+  igst?: number
+  gstPercent?: number
+  amountInWords?: string
   totalAmount: number
   status: 'paid' | 'unpaid'
   createdAt: string
@@ -303,6 +351,7 @@ export interface CreateInvoiceData {
   lrList: string[]
   invoiceNo?: string
   invoiceDate?: string
+  companyCode?: string // 11=SPICE, 12=ASIAN
   freightValue?: number
   gstPercent?: number
 }
@@ -316,6 +365,7 @@ export interface LaneRate {
 export interface Customer {
   _id: string;
   code: string;
+  name?: string; // Same as company, auto-set from company if not provided
   company: string;
   address?: string;
   state?: string;

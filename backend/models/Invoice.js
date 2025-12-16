@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const invoiceSchema = new mongoose.Schema({
   invoiceNumber: String,
   invoiceNo: String,
+  companyCode: { type: String, enum: ['11', '12'], default: '11' }, // 11=SPICE, 12=ASIAN
   customerCode: String,
   lrList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'LR' }],
   date: Date,
