@@ -1,5 +1,5 @@
 import express from 'express';
-import cors from 'cors'; 
+import cors from 'cors';
 import annexureRoutes from './routes/annexureRoutes.js';
 import invoiceRoutes from './routes/invoiceRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
@@ -15,25 +15,26 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    
-    const allowedOrigins = process.env.NODE_ENV === 'production' 
+
+    const allowedOrigins = process.env.NODE_ENV === 'production'
       ? [
-          process.env.FRONTEND_URL || 'https://spiceexpress.netlify.app',
-          'https://spiceexpress-frontend.netlify.app',
-          'https://main--spiceexpress.netlify.app',
-          'https://spiceexpress.netlify.app',
-          // Allow any Netlify subdomain for this project
-          /https:\/\/.*--spiceexpress\.netlify\.app$/,
-          /https:\/\/spiceexpress.*\.netlify\.app$/
-        ]
+        process.env.FRONTEND_URL || 'https://spiceexpress.netlify.app',
+        'https://spiceexpress-frontend.netlify.app',
+        'https://spiceexpress-demo.netlify.app',
+        'https://main--spiceexpress.netlify.app',
+        'https://spiceexpress.netlify.app',
+        // Allow any Netlify subdomain for this project
+        /https:\/\/.*--spiceexpress.*\.netlify\.app$/,
+        /https:\/\/spiceexpress.*\.netlify\.app$/
+      ]
       : [
-          'http://localhost:5173',
-          'http://127.0.0.1:5173',
-          'http://localhost:5174',
-          'http://127.0.0.1:5174',
-          'http://localhost:3000',
-          'http://127.0.0.1:3000'
-        ];
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:5174',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000'
+      ];
 
     // Check if origin is allowed
     const isAllowed = allowedOrigins.some(allowedOrigin => {
@@ -64,8 +65,8 @@ app.use('/uploads', express.static('public/uploads'));
 
 // Health check endpoint for Render
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.status(200).json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
@@ -73,8 +74,8 @@ app.get('/health', (req, res) => {
 
 // Root endpoint
 app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Spice Express API is running!', 
+  res.json({
+    message: 'Spice Express API is running!',
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development'
   });

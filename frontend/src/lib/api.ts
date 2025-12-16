@@ -1,8 +1,5 @@
-// Get API URL with fallback options
-const API_BASE_URL = import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD
-    ? 'https://spiceexpress-backend.vercel.app/api'
-    : 'http://localhost:5000/api');
+// API URL - Always use Vercel backend (override with VITE_API_URL env var if needed)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://spiceexpress-backend.vercel.app/api';
 
 // Debug logging (temporary)
 console.log('🚀 API Configuration:');
@@ -49,9 +46,13 @@ function authHeaders(): HeadersInit {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+// Guard to prevent multiple simultaneous redirects
+let isRedirecting = false;
+
 // Handle 401 responses by clearing auth and redirecting to login
 function handleUnauthorized(response: Response): void {
-  if (response.status === 401) {
+  if (response.status === 401 && !isRedirecting) {
+    isRedirecting = true;
     console.warn('🔐 Unauthorized response detected - clearing auth and redirecting to login');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
@@ -59,9 +60,13 @@ function handleUnauthorized(response: Response): void {
     // Dispatch auth state change event
     window.dispatchEvent(new CustomEvent('authStateChanged'));
 
-    // Redirect to login page
+    // Redirect to login page (with small delay to ensure single redirect)
     if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-      window.location.href = '/login';
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 100);
+    } else {
+      isRedirecting = false;
     }
   }
 }
