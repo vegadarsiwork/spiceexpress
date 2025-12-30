@@ -7,7 +7,7 @@ const LOCALHOST_URL = 'http://localhost:5000/api';
 const PRODUCTION_URL = 'https://spiceexpress-production.up.railway.app/api';
 
 // Set USE_LOCALHOST to true for local development, false for production
-const USE_LOCALHOST = true;
+const USE_LOCALHOST = false;
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || (USE_LOCALHOST ? LOCALHOST_URL : PRODUCTION_URL);
 
