@@ -1,10 +1,10 @@
 // API URL Configuration
 // Development: http://localhost:5000/api
-// Production: https://spiceexpress-production.up.railway.app/api
+// Production: https://spiceexpress.onrender.com/api
 // Override with VITE_API_URL env var if needed
 
 const LOCALHOST_URL = 'http://localhost:5000/api';
-const PRODUCTION_URL = 'https://spiceexpress-production.up.railway.app/api';
+const PRODUCTION_URL = 'https://spiceexpress.onrender.com/api';
 
 // Set USE_LOCALHOST to true for local development, false for production
 const USE_LOCALHOST = false;
