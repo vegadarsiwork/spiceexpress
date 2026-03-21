@@ -20,8 +20,7 @@ const corsOptions = {
 };
 
 // Handle preflight OPTIONS requests explicitly
-// Express 5 requires named splat pattern for wildcards
-app.options('/*splat', cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static('public/uploads'));
