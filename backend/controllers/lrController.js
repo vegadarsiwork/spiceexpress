@@ -170,7 +170,10 @@ export const downloadLR = async (req, res) => {
     }
 
     const isAsian = lr.lrNumber && lr.lrNumber.startsWith('ATL');
-    const companyName = isAsian ? "ASIAN TRANSPORT LOGISTICS" : "SPICE EXPRESS";
+    const companyCode = isAsian ? '12' : '11';
+    const { getCompany } = await import('../config/companies.js');
+    const company = getCompany(companyCode);
+    const companyName = company.name;
     const logoFormat = isAsian ? 'JPEG' : 'PNG';
 
     const fs = await import('fs');
@@ -211,8 +214,10 @@ export const downloadLR = async (req, res) => {
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(0);
-      doc.text("TRACK @ www.spiceexpress.in", margin, startY - 2);
-      doc.text("Email - info@spiceexpress.co.in", pageWidth - margin, startY - 2, { align: "right" });
+      const trackWebsite = company.website ? `TRACK @ ${company.website}` : `TRACK @ www.spiceexpress.in`;
+      const headerEmail = company.email || 'info@spiceexpress.co.in';
+      doc.text(trackWebsite, margin, startY - 2);
+      doc.text(`Email - ${headerEmail}`, pageWidth - margin, startY - 2, { align: "right" });
 
       // --- Main Box Boundary ---
       doc.setDrawColor(0); // Black
@@ -266,14 +271,14 @@ export const downloadLR = async (req, res) => {
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "bold");
-      doc.text("SPICE EXPRESS", margin + 4, startY + 27);
+      doc.text(companyName, margin + 4, startY + 27);
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
-      doc.text("Block D, Plot No. D 464, Martin nagar, Mankapur, Nagpur 440002", margin + 4, startY + 31);
+      doc.text(company.address || 'Block D, Plot No. D 464, Martin nagar, Mankapur, Nagpur 440002', margin + 4, startY + 31, { maxWidth: 98 });
 
       // GST No
       doc.setFont("helvetica", "normal");
-      doc.text("GST No.:27AEMFS2408G1ZY", topDividerX - 2, startY + 8, { align: "right" });
+      doc.text(`GST No.:${company.gstin || '27AEMFS2408G1ZY'}`, topDividerX - 2, startY + 8, { align: "right" });
 
       // Right side of Top Section: LR Num, Origin, Dest
       // Horizontal dividers
@@ -430,7 +435,7 @@ export const downloadLR = async (req, res) => {
       // Signature block
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
-      doc.text("For, THE SPICE EXPRESS", pageWidth - margin - 4, tableBottomY + 5, { align: 'right' });
+      doc.text(`For, ${companyName}`, pageWidth - margin - 4, tableBottomY + 5, { align: 'right' });
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.text("Booking Branch / FR Code", pageWidth - margin - 4, tableBottomY + 9, { align: 'right' });

@@ -33,7 +33,7 @@ const companies = {
         website: 'www.spiceexpress.in',
         phone: '',
         hsnCode: '9969',
-        bankName: 'Kotak Mahindra Bank',
+        bankName: 'KOTAK MAHINDRA BANK',
         accountName: 'ASIAN TRADES LINK',
         accountNo: '0948644922',
         ifsc: 'KKBK0001851',
