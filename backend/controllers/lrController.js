@@ -214,9 +214,12 @@ export const downloadLR = async (req, res) => {
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(0);
-      const trackWebsite = company.website ? `TRACK @ ${company.website}` : `TRACK @ www.spiceexpress.in`;
+      const configuredWebsite = (company.website || '').trim();
+      const trackWebsite = `TRACK @ ${configuredWebsite || 'www.spiceexpress.in'}`;
       const headerEmail = company.email || 'info@spiceexpress.co.in';
-      doc.text(trackWebsite, margin, startY - 2);
+      if (!isAsian) {
+        doc.text(trackWebsite, margin, startY - 2);
+      }
       doc.text(`Email - ${headerEmail}`, pageWidth - margin, startY - 2, { align: "right" });
 
       // --- Main Box Boundary ---

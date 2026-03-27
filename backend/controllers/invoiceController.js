@@ -540,14 +540,14 @@ export const downloadInvoice = async (req, res) => {
     doc.setFont("helvetica", "normal");
     doc.text(`Registered Office: ${company.address || 'Block D, Plot No. D 464, Martin nagar, Mankapur, Nagpur - 440002, Maharashtra.'}`, margin, footerStartY + 4);
     doc.text(`Email: ${coEmail}`, margin, footerStartY + 8);
-    if (company.website) {
+    if (company.website && company.code === '11') {
       doc.text(`Web: ${company.website}`, margin, footerStartY + 12);
     }
     doc.text(`CIN: ${company.cin || ''}`, margin, footerStartY + 16);
 
     try {
       const footerPath = path.resolve(__dirname, '../temp/footer.png');
-      if (fs.existsSync(footerPath)) {
+      if (company.code === '11' && fs.existsSync(footerPath)) {
         const footerBuffer = fs.readFileSync(footerPath);
         const footerBase64Str = `data:image/png;base64,${footerBuffer.toString('base64')}`;
         const base64Data = footerBase64Str.split(',')[1];
