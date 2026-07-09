@@ -6,6 +6,7 @@ import { Card as ShadCard } from '../components/ui/card'
 import { Button as ShadButton } from '../components/ui/button'
 import { Label as ShadLabel } from '../components/ui/label'
 import { motion } from 'framer-motion'
+import { FileSpreadsheet, FileText } from 'lucide-react'
 
 export default function Invoices() {
   const [invoiceSearch, setInvoiceSearch] = useState('');
@@ -148,7 +149,6 @@ export default function Invoices() {
         gstPercent: Number(formData.gstPercent || 0)
       }
       await invoiceApi.create(payload);
-      setFormData({ customerCode: '', lrList: [] });
       setFormData({ customerCode: '', lrList: [], invoiceNo: '', invoiceDate: new Date().toISOString().slice(0, 10), freightValue: 0, gstPercent: 0 })
       await loadInvoices();
     } catch (err: any) {
@@ -187,7 +187,7 @@ export default function Invoices() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 16 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-full font-publicsans"
+        className="p-4 sm:p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] font-publicsans"
       >
         <div className="text-lg text-gray-600 dark:text-gray-300">Loading invoices...</div>
       </motion.div>
@@ -199,11 +199,11 @@ export default function Invoices() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-full font-publicsans"
+      className="p-4 sm:p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] font-publicsans"
     >
       {/* Create Invoice Form (admin only) */}
       {user && user.role === 'admin' && (
-        <ShadCard className="mb-8 bg-white dark:bg-gray-800 dark:border-gray-700">
+        <ShadCard className="mb-8 bg-white dark:bg-slate-900 dark:border-gray-700">
           <div className="p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Create New Invoice</h2>
             <form onSubmit={createInvoice} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -223,10 +223,10 @@ export default function Invoices() {
                   }}
                   onFocus={() => setShowCustomerDropdown(true)}
                   onBlur={() => setTimeout(() => setShowCustomerDropdown(false), 150)}
-                  className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  className="w-full border rounded px-2 py-2 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
                 />
                 {showCustomerDropdown && filteredCustomers.length > 0 && (
-                  <div className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-gray-700 rounded shadow max-h-60 overflow-y-auto">
                     {filteredCustomers.map(c => (
                       <div
                         key={c._id}
@@ -257,7 +257,7 @@ export default function Invoices() {
                 <select
                   value={formData.companyCode || '11'}
                   onChange={(e) => handleInputChange('companyCode', e.target.value)}
-                  className="w-full border rounded px-2 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+                  className="w-full border rounded px-2 py-2 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 >
                   <option value="11">SPICE EXPRESS</option>
                   <option value="12">ASIAN TRADES LINK</option>
@@ -265,10 +265,10 @@ export default function Invoices() {
               </div>
               <div className="md:col-span-2">
                 <ShadLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Shipment Info</ShadLabel>
-                <div className="border rounded bg-white dark:bg-gray-900">
+                <div className="border rounded bg-white dark:bg-slate-950">
                   <table className="min-w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
+                      <tr className="bg-gray-50 dark:bg-slate-900 text-gray-700 dark:text-gray-200">
                         <th className="px-3 py-2"><input type="checkbox" onChange={(e) => {
                           if (!e.target.checked) handleInputChange('lrList', [])
                           else {
@@ -320,9 +320,9 @@ export default function Invoices() {
                 <Input type="number" value={formData.gstPercent} onChange={(e) => handleInputChange('gstPercent', Number(e.target.value))} />
               </div>
               <div className="md:col-span-2">
-                <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                <div className="p-3 bg-gray-100 dark:bg-slate-900 rounded">
                   <div className="text-sm text-gray-700 dark:text-gray-300">Total Amount</div>
-                  <div className="text-xl font-semibold">₹{computedTotal.toLocaleString()}</div>
+                  <div className="text-xl font-semibold">Rs. {computedTotal.toLocaleString()}</div>
                 </div>
               </div>
               <div className="md:col-span-2">
@@ -354,7 +354,7 @@ export default function Invoices() {
             value={invoiceSearch}
             onChange={e => setInvoiceSearch(e.target.value)}
             placeholder="Search invoices by customer, code, invoice #, or date"
-            className="w-full border rounded px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full border rounded px-3 py-2 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100"
           />
         </div>
         {error && (
@@ -364,7 +364,7 @@ export default function Invoices() {
           <div className="text-gray-500 text-sm dark:text-gray-400">No unpaid invoices found.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <table className="min-w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-gray-700 rounded-lg">
               <thead>
                 <tr className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm">
                   <th className="px-4 py-2 text-left">Invoice #</th>
@@ -394,7 +394,7 @@ export default function Invoices() {
                       <td className="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">{inv.invoiceNumber}</td>
                       <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{getCustomerDisplay(inv.customerCode)}</td>
                       <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{inv.date ? new Date(inv.date).toLocaleDateString() : '-'}</td>
-                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">₹{inv.totalAmount?.toLocaleString()}</td>
+                      <td className="px-4 py-2 text-gray-900 dark:text-gray-100">Rs. {inv.totalAmount?.toLocaleString()}</td>
                       <td className="px-4 py-2 text-gray-700 dark:text-gray-300">{Array.isArray(inv.lrList) ? inv.lrList.length : 0}</td>
                       <td className="px-4 py-2">
                         <a
@@ -408,16 +408,18 @@ export default function Invoices() {
                         <button
                           type="button"
                           onClick={() => downloadInvoice(inv._id)}
-                          className="inline-flex items-center px-3 py-1.5 rounded bg-blue-500 text-white hover:bg-blue-600 text-xs font-medium"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-blue-500 text-white hover:bg-blue-600 text-xs font-medium"
                         >
-                          📄 PDF
+                          <FileText className="h-3.5 w-3.5" />
+                          PDF
                         </button>
                         <button
                           type="button"
                           onClick={() => downloadAnnexure(inv._id)}
-                          className="inline-flex items-center px-3 py-1.5 rounded bg-emerald-500 text-white hover:bg-emerald-600 text-xs font-medium"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-emerald-500 text-white hover:bg-emerald-600 text-xs font-medium"
                         >
-                          📊 Annexure
+                          <FileSpreadsheet className="h-3.5 w-3.5" />
+                          Annexure
                         </button>
                       </td>
                     </tr>

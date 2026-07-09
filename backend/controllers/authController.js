@@ -1,9 +1,19 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import {
+  createUser,
+  emailExists,
+  findUserById,
+  findUserForLogin,
+  updateUser,
+  verifyPassword,
+} from '../lib/repositories/usersRepository.js';
 
-const jwtSecret = process.env.JWT_SECRET || 'dev_secret_change_me';
-const jwtExpiry = '60d'; // 60 days (~2 months)
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  console.error('FATAL: JWT_SECRET environment variable is not set');
+  process.exit(1);
+}
+const jwtExpiry = '7d';
 
 export const register = async (req, res) => {
   try {
@@ -11,19 +21,17 @@ export const register = async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    const existing = await User.findOne({ email });
-    if (existing) {
+    if (await emailExists(email)) {
       return res.status(409).json({ error: 'Email already registered' });
     }
-    const passwordHash = await bcrypt.hash(password, 10);
-    // Always assign 'user' role for new registrations
-    const user = await User.create({ name, email, passwordHash, role: 'user' });
+    const user = await createUser({ name, email, password });
     return res.status(201).json({
-      token: jwt.sign({ sub: user._id, role: user.role }, jwtSecret, { expiresIn: jwtExpiry }),
-      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+      token: jwt.sign({ sub: user.id, role: user.role }, jwtSecret, { expiresIn: jwtExpiry }),
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Registration failed', details: err.message });
+    console.error('Registration error:', err);
+    return res.status(500).json({ error: 'Registration failed' });
   }
 };
 
@@ -31,15 +39,26 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-    const user = await User.findOne({ email });
+    const user = await findUserForLogin(email);
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-    const ok = await bcrypt.compare(password, user.passwordHash);
+    const ok = await verifyPassword(password, user.passwordHash);
     if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ sub: user._id, role: user.role }, jwtSecret, { expiresIn: jwtExpiry });
-    return res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    const token = jwt.sign({ sub: user.id, role: user.role }, jwtSecret, { expiresIn: jwtExpiry });
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        company: user.company,
+      }
+    });
   } catch (err) {
-    return res.status(500).json({ error: 'Login failed', details: err.message });
+    console.error('Login error:', err);
+    return res.status(500).json({ error: 'Login failed' });
   }
 };
 
@@ -49,7 +68,7 @@ export const me = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     // Fetch fresh user data from DB for up-to-date info
-    const user = await User.findById(req.user.sub || req.user._id).select('-passwordHash');
+    const user = await findUserById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -61,7 +80,8 @@ export const me = async (req, res) => {
       avatar = `${protocol}://${host}${avatar}`;
     }
     return res.json({
-      id: user._id,
+      id: user.id,
+      _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -71,7 +91,8 @@ export const me = async (req, res) => {
       avatar
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch profile', details: err.message });
+    console.error('Profile fetch error:', err);
+    return res.status(500).json({ error: 'Failed to fetch profile' });
   }
 };
 
@@ -83,15 +104,11 @@ export const updateMe = async (req, res) => {
     }
     // Allow updating all editable fields, including avatar
     const updateFields = {};
-    const allowed = ['name', 'role', 'phone', 'company', 'address', 'avatar'];
+    const allowed = ['name', 'phone', 'company', 'address', 'avatar'];
     for (const key of allowed) {
       if (req.body[key] !== undefined) updateFields[key] = req.body[key];
     }
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { $set: updateFields },
-      { new: true, runValidators: true, select: '-passwordHash' }
-    );
+    const user = await updateUser(req.user.id, updateFields);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -103,7 +120,8 @@ export const updateMe = async (req, res) => {
       avatar = `${protocol}://${host}${avatar}`;
     }
     return res.json({
-      id: user._id,
+      id: user.id,
+      _id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -113,7 +131,8 @@ export const updateMe = async (req, res) => {
       avatar
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to update profile', details: err.message });
+    console.error('Profile update error:', err);
+    return res.status(500).json({ error: 'Failed to update profile' });
   }
 };
 

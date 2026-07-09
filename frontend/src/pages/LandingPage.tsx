@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import TrackingLight from '../components/TrackingLight';
 import AboutStats from '../components/AboutStats';
 import Carousel from '../components/Carousel';
-import { Train, Truck, Shield, Settings, Users, Check } from 'lucide-react';
+import { Star, Train, Truck, Shield, Settings, Users, Check } from 'lucide-react';
 import { isAuthed } from '../lib/auth';
 import { useRotatingText } from '../lib/animations';
 
@@ -48,17 +48,17 @@ const LandingPage = () => {
   }, []);
   // Zones and rate matrix (kept in-memory as requested)
   const ZONES = [
-    { id: 'north1', label: 'North 1 — National Capital Region (Delhi)' },
-    { id: 'north2', label: 'North 2 — Uttar Pradesh, Punjab, Haryana, HP, Rajasthan' },
-    { id: 'west1', label: 'West 1 — Maharashtra (Mumbai, Pune)' },
-    { id: 'west2', label: 'West 2 — Rest of Maharashtra, Goa, Gujarat' },
-    { id: 'central', label: 'Central — Madhya Pradesh, Chhattisgarh' },
-    { id: 'south1', label: 'South 1 — Karnataka, Chennai, Puducherry, Andhra Pradesh, Telangana' },
-    { id: 'south2', label: 'South 2 — Tamil Nadu (Exc. Chennai), Kerala' },
-    { id: 'east', label: 'East — West Bengal, Sikkim, Bihar, Orissa, Jharkhand' },
-    { id: 'northeast', label: 'North East — Guwahati City' },
-    { id: 'nepal', label: 'Nepal — As per Request' },
-    { id: 'bangladesh', label: 'Bangladesh — As per Request' },
+    { id: 'north1', label: 'North 1 - National Capital Region (Delhi)' },
+    { id: 'north2', label: 'North 2 - Uttar Pradesh, Punjab, Haryana, HP, Rajasthan' },
+    { id: 'west1', label: 'West 1 - Maharashtra (Mumbai, Pune)' },
+    { id: 'west2', label: 'West 2 - Rest of Maharashtra, Goa, Gujarat' },
+    { id: 'central', label: 'Central - Madhya Pradesh, Chhattisgarh' },
+    { id: 'south1', label: 'South 1 - Karnataka, Chennai, Puducherry, Andhra Pradesh, Telangana' },
+    { id: 'south2', label: 'South 2 - Tamil Nadu (Exc. Chennai), Kerala' },
+    { id: 'east', label: 'East - West Bengal, Sikkim, Bihar, Orissa, Jharkhand' },
+    { id: 'northeast', label: 'North East - Guwahati City' },
+    { id: 'nepal', label: 'Nepal - As per Request' },
+    { id: 'bangladesh', label: 'Bangladesh - As per Request' },
   ];
 
   // Rate matrix mapping from -> to (Rs per Kg)
@@ -683,7 +683,7 @@ const LandingPage = () => {
         {/* Right: Dashboard image */}
         <div className="flex items-center justify-center relative">
           <div className="w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 flex flex-col items-center justify-center animate-float">
-            <div className="absolute top-6 right-6 bg-white rounded-full px-4 py-2 shadow text-green-600 font-semibold text-sm flex items-center gap-2">● Online Tracking</div>
+            <div className="absolute top-6 right-6 bg-white rounded-full px-4 py-2 shadow text-green-600 font-semibold text-sm flex items-center gap-2"><Check className="h-4 w-4" /> Online Tracking</div>
             <img src="/dashboard.png" alt="Spice Express Dashboard" className="w-full h-80 object-cover rounded-2xl mb-2" />
           </div>
         </div>
@@ -695,24 +695,24 @@ const LandingPage = () => {
         <h3 className="text-2xl font-bold mb-8 text-gray-900">What Our Clients Say</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-start">
-            <div className="text-yellow-400 text-2xl mb-3">★★★★★</div>
+            <div className="mb-3 flex text-yellow-400"><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /></div>
             <div className="text-gray-900 font-normal mb-4 text-left">"Their rail movement network is a game changer. Even during peak seasons, they maintained next-day delivery for us. Our inventory planning became more efficient because we finally had a partner we could depend on."</div>
-            <div className="text-gray-700 text-sm font-semibold">— Schneider Electric, SCM Head</div>
+            <div className="text-gray-700 text-sm font-semibold">- Schneider Electric, SCM Head</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-start">
-            <div className="text-yellow-400 text-2xl mb-3">★★★★★</div>
+            <div className="mb-3 flex text-yellow-400"><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /></div>
             <div className="text-gray-900 font-normal mb-4 text-left">"Earlier we struggled with unpredictable delivery timelines. After switching to their next-day rail cargo model, our dispatches became smoother and customer complaints dropped drastically. The tracking, communication, and professionalism are top-notch."</div>
-            <div className="text-gray-700 text-sm font-semibold">— Tata Hitachi, SCM Manager</div>
+            <div className="text-gray-700 text-sm font-semibold">- Tata Hitachi, SCM Manager</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-start">
-            <div className="text-yellow-400 text-2xl mb-3">★★★★★</div>
+            <div className="mb-3 flex text-yellow-400"><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /></div>
             <div className="text-gray-900 font-normal mb-4 text-left">"For pharma, timing is everything. Their next-day delivery has consistently kept our time-critical shipments on track. Reliable, fast, and absolutely dependable. Zero delays in 8 months."</div>
-            <div className="text-gray-700 text-sm font-semibold">— Zim Laboratories, Operations Head</div>
+            <div className="text-gray-700 text-sm font-semibold">- Zim Laboratories, Operations Head</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-start">
-            <div className="text-yellow-400 text-2xl mb-3">★★★★★</div>
+            <div className="mb-3 flex text-yellow-400"><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /><Star className="h-5 w-5 fill-current" /></div>
             <div className="text-gray-900 font-normal mb-4 text-left">"We work with multiple logistics companies, but none match their commitment to timelines. Their next-day cargo delivery has helped us reduce storage costs and improve turnaround time. Highly recommended."</div>
-            <div className="text-gray-700 text-sm font-semibold">— Koye Pharmaceuticals, CEO</div>
+            <div className="text-gray-700 text-sm font-semibold">- Koye Pharmaceuticals, CEO</div>
           </div>
         </div>
       </section>
@@ -786,7 +786,7 @@ const LandingPage = () => {
     {/* Green CTA Bar */}
     <ScrollReveal y={20} scale={0.99}>
       <section className="py-4 bg-green-700 text-white text-center">
-        <span className="font-semibold">🚄 Eco-friendly rail logistics: choose a greener supply chain.</span>
+        <span className="inline-flex items-center justify-center gap-2 font-semibold"><Train className="h-5 w-5" /> Eco-friendly rail logistics: choose a greener supply chain.</span>
       </section>
     </ScrollReveal>
 
@@ -998,7 +998,7 @@ const LandingPage = () => {
           </div>
         </div>
         <div className="mt-8 border-t pt-4 flex flex-col md:flex-row items-center justify-between text-xs text-neutral-400 px-6" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-          <span>© 2024 Spice Express & Logistics Company. All rights reserved.</span>
+          <span>Copyright 2024 Spice Express & Logistics Company. All rights reserved.</span>
           <div className="flex gap-4 mt-2 md:mt-0">
             <a href="#" className="hover:underline transition-smooth">Privacy Policy</a>
             <a href="#" className="hover:underline transition-smooth">Terms of Service</a>
@@ -1012,3 +1012,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+

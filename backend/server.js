@@ -1,17 +1,31 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import app from './app.js';
-import mongoose from 'mongoose';
-
-// Load environment variables
-dotenv.config();
+import { closePool, getPool, getSqlConfig } from './lib/sqlServer.js';
 
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://vegadarsiwork:vega@cluster0.p2ruof7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+try {
+  const config = getSqlConfig();
+  await getPool();
+  console.log(`SQL Server connected to ${config.database}`);
+} catch (err) {
+  console.error('DB connection error:', err);
+  process.exit(1);
+}
 
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch((err) => console.error("DB connection error:", err));
+const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Graceful shutdown
+const gracefulShutdown = async (signal) => {
+  console.log(`${signal} received. Shutting down gracefully...`);
+  server.close(async () => {
+    await closePool();
+    console.log('SQL Server disconnected. Process terminated.');
+    process.exit(0);
+  });
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+};
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

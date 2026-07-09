@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { motion as fmMotion } from 'framer-motion';
+import { Menu, Moon, Sun, User, X } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
@@ -34,18 +35,20 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
   const isLanding = location.pathname === '/';
   const landingClass = 'min-h-screen bg-white transition-colors duration-500';
   const landingBg = '#fff';
+  const appClass = 'min-h-[100dvh] bg-slate-50 text-slate-950 transition-colors duration-500 dark:bg-slate-950 dark:text-slate-100';
+  const appBg = darkMode ? '#020617' : '#f8fafc';
   return (
     <>
       <fmMotion.div
-        className={isLanding ? landingClass : (darkMode ? 'min-h-screen bg-gray-950 transition-colors duration-500' : 'min-h-screen bg-white transition-colors duration-500')}
-        animate={{ backgroundColor: isLanding ? landingBg : (darkMode ? '#09090b' : '#fff') }}
+        className={isLanding ? landingClass : appClass}
+        animate={{ backgroundColor: isLanding ? landingBg : appBg }}
         transition={{ duration: 0.5 }}
       >
         {/* Session expired modal */}
         {sessionExpiredModal.open && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black opacity-40" />
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 z-60 max-w-md mx-4">
+            <div className="bg-white dark:bg-slate-900 rounded-lg p-6 z-60 max-w-md mx-4">
               <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Session expired</h3>
               <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">{sessionExpiredModal.message || 'Your session has expired. You will be redirected to the login page.'}</p>
               <div className="flex gap-3 justify-end">
@@ -67,7 +70,7 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
         )}
         {/* Only show header/sidebar if not on landing page */}
         {isAuthed && !isLanding && (
-          <header className={darkMode ? "sticky top-0 z-10 bg-gray-950 border-b border-gray-800" : "sticky top-0 z-10 bg-white border-b border-gray-200"}>
+          <header className={darkMode ? "sticky top-0 z-10 bg-slate-950 border-b border-slate-800" : "sticky top-0 z-10 bg-white border-b border-slate-200"}>
             <div className="max-w-7xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
               {/* Logo and Hamburger for mobile */}
               <div className="flex items-center gap-3 sm:gap-4">
@@ -76,24 +79,22 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
                 </div>
                 <h1 className={darkMode ? "text-lg sm:text-xl font-semibold text-gray-100" : "text-lg sm:text-xl font-semibold text-gray-900"}>Spice Express</h1>
               </div>
-              {/* Emoji menu bar, now visible on all screen sizes, with dark mode toggle */}
+              {/* Header actions */}
               <div className="flex items-center gap-2 sm:gap-4">
                 <button
-                  className={darkMode ? "w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-200 hover:bg-gray-700" : "w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"}
+                  className={darkMode ? "w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-slate-200 hover:bg-slate-800" : "w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200"}
                   onClick={() => setSidebarOpen(true)}
                   aria-label="Open navigation menu"
                 >
-                  <span className="sr-only">Open menu</span>
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                  <Menu className="h-5 w-5" />
                 </button>
                 <NavLink to="/profile">
-                  <button className={darkMode ? "w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-200 hover:bg-gray-700" : "w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"}>
-                    👤
+                  <button className={darkMode ? "w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-slate-200 hover:bg-slate-800" : "w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200"} aria-label="Profile">
+                    <User className="h-4 w-4" />
                   </button>
                 </NavLink>
-                {/* Dark mode toggle */}
                 <button
-                  className={darkMode ? "w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-yellow-300 hover:bg-gray-700 transition-colors" : "w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-yellow-500 hover:bg-gray-200 transition-colors"}
+                  className={darkMode ? "w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-amber-300 hover:bg-slate-800 transition-colors" : "w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-amber-500 hover:bg-slate-200 transition-colors"}
                   onClick={() => setDarkMode((d: boolean) => !d)}
                   aria-label="Toggle dark mode"
                 >
@@ -104,7 +105,7 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
                     exit={{ rotate: -90, opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {darkMode ? '🌙' : '☀️'}
+                    {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                   </fmMotion.span>
                 </button>
               </div>
@@ -127,7 +128,7 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
                   aria-hidden="true"
                 />
                 <fmMotion.div
-                  className="relative w-64 max-w-full h-full bg-white shadow-xl z-50 mobile-sidebar-panel"
+                  className="relative w-64 max-w-full h-full bg-white shadow-xl z-50 mobile-sidebar-panel dark:bg-slate-950"
                   initial={{ x: -320 }}
                   animate={{ x: sidebarOpen ? 0 : -320 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -135,11 +136,11 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
                 >
                   <Sidebar />
                   <button
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                    className="absolute top-4 right-4 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                     onClick={() => setSidebarOpen(false)}
                     aria-label="Close navigation menu"
                   >
-                    <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <X className="h-6 w-6" />
                   </button>
                 </fmMotion.div>
               </div>
@@ -171,6 +172,7 @@ const PageLayout = ({ isAuthed, darkMode, setDarkMode, sidebarOpen, setSidebarOp
               <Route path="/create-lr" element={<PrivateRoute roles={["admin"]}><CreateLR /></PrivateRoute>} />
               <Route path="/edit-lr/:lrId" element={<PrivateRoute roles={["admin"]}><CreateLR editMode={true} /></PrivateRoute>} />
               <Route path="/mis" element={<PrivateRoute roles={["admin"]}><MIS /></PrivateRoute>} />
+              <Route path="*" element={<div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center"><h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">404 - Page Not Found</h1></div>} />
             </Routes>
           </main>
         </div>

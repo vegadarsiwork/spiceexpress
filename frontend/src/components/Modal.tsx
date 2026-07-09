@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   open: boolean;
@@ -31,7 +32,7 @@ export default function Modal({ open, onClose, children, lightMode = false }: Mo
           onClick={onClose}
         >
           <motion.div
-            className={`${lightMode ? 'bg-white' : 'bg-white dark:bg-gray-900'} rounded-xl shadow-xl mx-4 relative`}
+            className={`${lightMode ? 'bg-white' : 'bg-white dark:bg-slate-950'} rounded-xl shadow-xl mx-4 relative`}
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -39,11 +40,11 @@ export default function Modal({ open, onClose, children, lightMode = false }: Mo
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => e.stopPropagation()}
           >
             <button
-              className={`absolute top-3 right-3 ${lightMode ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'} text-xl font-bold`}
+              className={`absolute top-3 right-3 ${lightMode ? 'text-gray-400 hover:text-gray-700' : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
               onClick={onClose}
               aria-label="Close"
             >
-              ×
+              <X className="h-5 w-5" />
             </button>
             {children}
           </motion.div>

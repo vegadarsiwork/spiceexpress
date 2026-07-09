@@ -92,7 +92,7 @@ export default function CustomerList() {
   const totalPages = Math.ceil(filtered.length / pageSize);
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">List of Customers</h1>
         <button
@@ -108,10 +108,10 @@ export default function CustomerList() {
           placeholder="Filter customers..."
           value={filter}
           onChange={e => setFilter(e.target.value)}
-          className="border rounded px-3 py-2 w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+          className="border rounded px-3 py-2 w-64 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
         />
       </div>
-      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700">
+      <div className="overflow-x-auto bg-white dark:bg-slate-900 rounded-xl shadow border border-gray-200 dark:border-gray-700">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead>
             <tr>

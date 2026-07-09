@@ -139,10 +139,10 @@ export default function RateMapping() {
   };
 
   return (
-    <div className="min-h-full bg-gray-50 dark:bg-gray-900 flex flex-col items-center py-10 px-4 sm:px-8">
+    <div className="min-h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-slate-950 flex flex-col items-center py-10 px-4 sm:px-8">
       <div className="w-full max-w-2xl">
         <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100 text-center">Rate Mapping</h1>
-        <div className="mb-8 p-6 rounded-xl bg-white dark:bg-gray-800 shadow">
+        <div className="mb-8 p-6 rounded-xl bg-white dark:bg-slate-900 shadow">
           <Label className="mb-2 text-lg font-semibold block">Select Customer</Label>
           <div className="relative">
             <Input
@@ -154,7 +154,7 @@ export default function RateMapping() {
               autoComplete="off"
             />
             {customerSearch.trim() && (
-              <div className="absolute left-0 right-0 top-full z-10 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded shadow mt-1 max-h-60 overflow-auto">
+              <div className="absolute left-0 right-0 top-full z-10 bg-white dark:bg-slate-950 border border-gray-200 dark:border-gray-700 rounded shadow mt-1 max-h-60 overflow-auto">
                 {customers
                   .filter(c =>
                     c.code.toLowerCase().includes(customerSearch.toLowerCase()) ||
@@ -164,7 +164,7 @@ export default function RateMapping() {
                   .map(c => (
                     <div
                       key={c._id}
-                      className={`px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 ${selectedCustomer?._id === c._id ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
+                      className={`px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-900 ${selectedCustomer?._id === c._id ? 'bg-gray-100 dark:bg-slate-900' : ''}`}
                       onClick={() => {
                         setSelectedCustomer(c);
                         setCustomerSearch('');
@@ -232,7 +232,7 @@ export default function RateMapping() {
                   name="rateType"
                   value={newLane.rateType}
                   onChange={(e) => setNewLane(l => ({ ...l, rateType: e.target.value as 'perKg' | 'perPackage' }))}
-                  className="border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+                  className="border rounded px-3 py-2 text-sm bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
                 >
                   <option value="perKg">per Kg</option>
                   <option value="perPackage">per Pkg</option>
@@ -249,7 +249,7 @@ export default function RateMapping() {
                   const rateVal = lane.rate || lane.ratePerKg || lane.ratePerPackage || 0;
                   const rateType = lane.rateType || (lane.ratePerPackage ? 'perPackage' : 'perKg');
                   return (
-                    <div key={laneKey} className="flex items-center gap-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-900">
+                    <div key={laneKey} className="flex items-center gap-4 p-3 rounded-lg bg-gray-100 dark:bg-slate-950">
                       <span className="text-gray-900 dark:text-gray-100 font-medium w-40">{lane.from} - {lane.to}</span>
                       <span className="text-gray-700 dark:text-gray-200 w-40">@ ₹{rateVal} / {rateType === 'perKg' ? 'kg' : 'pkg'}</span>
                       <Button

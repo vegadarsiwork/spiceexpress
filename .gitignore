@@ -97,3 +97,16 @@ Thumbs.db
 backend/public/uploads/*
 !backend/public/uploads/.gitkeep
 !backend/public/uploads/logos/
+.vercel
+
+# Local AI tooling (not part of the app)
+.claude/
+.claude-flow/
+.agents/
+.codex/
+.mcp.json
+CLAUDE.md
+AGENTS.md
+
+# Allow env template
+!backend/.env.example

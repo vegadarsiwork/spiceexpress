@@ -1,50 +1,48 @@
-# Spice Express Backend - Deployment Guide
+# Spice Express Backend
 
-## Deploy to Render
+Node/Express API for the Spice Express portal. The runtime database is the client's Microsoft SQL Server database, `CMSDB_21052026`.
 
-1. **Create Render Account**: Go to [render.com](https://render.com) and sign up
+## Required Environment
 
-2. **Create New Web Service**:
-   - Click "New" → "Web Service"
-   - Connect your GitHub repository
-   - Select the `backend` directory as root directory
+```bash
+NODE_ENV=production
+PORT=5000
+JWT_SECRET=change-this
+FRONTEND_URL=https://your-frontend-domain
 
-3. **Configure Service**:
-   - **Name**: `spiceexpress-backend`
-   - **Environment**: `Node`
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Plan**: Free
+MSSQL_HOST=127.0.0.1
+MSSQL_PORT=1433
+MSSQL_DATABASE=CMSDB_21052026
+MSSQL_USER=spice_api
+MSSQL_PASSWORD=change-this
+MSSQL_ENCRYPT=false
+MSSQL_TRUST_CERT=true
+```
 
-4. **Set Environment Variables** in Render dashboard:
-   ```
-   NODE_ENV=production
-   MONGO_URI=mongodb+srv://vegadarsiwork:vega@cluster0.p2ruof7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-   JWT_SECRET=your-super-secret-jwt-key-change-this
-   FRONTEND_URL=https://your-netlify-url.netlify.app
-   ```
+For SQL Server Express with a named instance, either expose a fixed TCP port and use `MSSQL_PORT`, or omit `MSSQL_PORT` and set:
 
-5. **Update FRONTEND_URL**: After deploying frontend, update this with your actual Netlify URL
+```bash
+MSSQL_INSTANCE=SQLEXPRESS
+```
 
-## API Endpoints
-
-- **Health Check**: `GET /health`
-- **Root**: `GET /`
-- **Public Tracking**: `GET /api/lr/track/:id` (no auth required)
-- **All other endpoints**: Require authentication
-
-## Local Development
+## Commands
 
 ```bash
 npm install
+npm run db:check
 npm run dev
+npm run build
 ```
 
-## Production Features
+## API Endpoints
 
-- ✅ CORS configured for production
-- ✅ Health check endpoint
-- ✅ Public tracking endpoint
-- ✅ Environment-based configuration
-- ✅ MongoDB connection
-- ✅ Static file serving
+- `GET /health`
+- `POST /api/auth/login`
+- `GET /api/lr/track/:id`
+- `GET /api/customers`
+- `GET /api/lr`
+- `GET /api/invoice`
+- `GET /api/mis/summary/:customerId`
+- `GET /api/v1/analytics/comparison`
+
+All endpoints except health, login, and public tracking require a bearer token.

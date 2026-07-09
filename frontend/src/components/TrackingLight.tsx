@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { lrApi } from '../lib/api'
 import { motion } from 'framer-motion'
+import { Check } from 'lucide-react'
 
 const STATUS_LABELS: Record<string, string> = {
   'Booked': 'Booked',
@@ -32,9 +33,7 @@ export default function TrackingLight() {
     setLoading(true)
     setLr(null)
     try {
-      const all = await lrApi.getAll()
-      const found = all.find((item: any) => item.lrNumber === lrNumber)
-      if (!found) throw new Error('No LR found with that number')
+      const found = await lrApi.track(lrNumber.trim())
       setLr(found)
       // Map legacy status values to backend values if needed
       let backendStatus: string = found.status;
@@ -111,30 +110,30 @@ export default function TrackingLight() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">From</p>
-                  <p className="font-semibold text-gray-900">{lr.from}</p>
+                  <p className="font-semibold text-gray-900">{lr.consignor?.city || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">To</p>
-                  <p className="font-semibold text-gray-900">{lr.to}</p>
+                  <p className="font-semibold text-gray-900">{lr.consignee?.city || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Consignor</p>
-                  <p className="font-semibold text-gray-900">{lr.consignorName}</p>
+                  <p className="font-semibold text-gray-900">{lr.consignor?.name || '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Consignee</p>
-                  <p className="font-semibold text-gray-900">{lr.consigneeName}</p>
+                  <p className="font-semibold text-gray-900">{lr.consignee?.name || '-'}</p>
                 </div>
-                {lr.weight && (
+                {lr.shipmentDetails?.actualWeight && (
                   <div>
                     <p className="text-sm text-gray-600">Weight</p>
-                    <p className="font-semibold text-gray-900">{lr.weight} kg</p>
+                    <p className="font-semibold text-gray-900">{lr.shipmentDetails.actualWeight} kg</p>
                   </div>
                 )}
-                {lr.date && (
+                {lr.bookingDate && (
                   <div>
                     <p className="text-sm text-gray-600">Booking Date</p>
-                    <p className="font-semibold text-gray-900">{new Date(lr.date).toLocaleDateString()}</p>
+                    <p className="font-semibold text-gray-900">{new Date(lr.bookingDate).toLocaleDateString()}</p>
                   </div>
                 )}
               </div>
@@ -164,7 +163,7 @@ export default function TrackingLight() {
                               : 'bg-gray-200 text-gray-400'
                           }`}
                         >
-                          {idx < currentStepIndex ? '✓' : idx + 1}
+                          {idx < currentStepIndex ? <Check className="h-4 w-4" /> : idx + 1}
                         </div>
                         <div className="mt-2 text-center">
                           <p
@@ -194,3 +193,4 @@ export default function TrackingLight() {
     </div>
   )
 }
+

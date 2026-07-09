@@ -22,7 +22,6 @@ export default function Login() {
     setLoading(true)
     
     // Test API connection first
-    console.log('🔍 Testing API connection...');
     const isConnected = await testAPIConnection();
     if (!isConnected) {
       setError('Cannot connect to backend server. Please check if backend is deployed and running.');
@@ -31,7 +30,6 @@ export default function Login() {
     }
     
     try {
-      console.log('🔐 Attempting login to:', `${API_BASE_URL}/auth/login`);
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,10 +37,9 @@ export default function Login() {
         mode: 'cors',
         credentials: 'omit'
       })
-      console.log('📊 Login response:', res.status, res.statusText);
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('❌ Login error response:', errorText);
+        console.error('Login error response:', errorText);
         throw new Error(`Login failed: ${res.status} ${res.statusText} - ${errorText}`);
       }
       const json = await res.json()
@@ -56,7 +53,7 @@ export default function Login() {
       
       navigate('/dashboard', { replace: true })
     } catch (err: any) {
-      console.error('🚨 Auth error:', err);
+      console.error('Auth error:', err);
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
         setError('Connection failed - check if backend is running');
       } else {
@@ -73,7 +70,7 @@ export default function Login() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-  className="min-h-screen flex items-center justify-center bg-gray-50"
+  className="min-h-[100dvh] flex items-center justify-center bg-slate-50"
     >
   <div className="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <div className="flex flex-col items-center mb-6">
@@ -102,7 +99,7 @@ export default function Login() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="border rounded-lg px-4 py-3 w-full bg-gray-100 text-gray-900 focus:bg-white focus:outline-none"
-              placeholder="••••••••"
+              placeholder="Password"
               required
             />
           </div>
@@ -112,7 +109,7 @@ export default function Login() {
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
       </div>

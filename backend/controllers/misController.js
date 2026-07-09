@@ -1,27 +1,21 @@
-import Customer from '../models/Customer.js';
-import LR from '../models/LR.js';
-import Invoice from '../models/Invoice.js';
 import ExcelJS from 'exceljs';
-import puppeteer from 'puppeteer';
-import ejs from 'ejs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import { findCustomerById } from '../lib/repositories/customersRepository.js';
+import { listInvoices } from '../lib/repositories/invoicesRepository.js';
+import { listLRs } from '../lib/repositories/lrsRepository.js';
 
 // GET /api/mis/summary/:customerId
 export const getCustomerMIS = async (req, res) => {
   try {
     const { customerId } = req.params;
     if (!customerId) return res.status(400).json({ error: 'Customer id is required' });
-    const customer = await Customer.findById(customerId).lean();
+    const customer = await findCustomerById(customerId);
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
 
     // LRs - search by customer ObjectId reference
-    const lrs = await LR.find({ customer: customerId }).sort({ bookingDate: -1 }).lean();
-    // Invoices
-    const invoices = await Invoice.find({ customerCode: customer.code }).sort({ date: -1 }).lean();
+    const lrs = await listLRs({ customerCode: customerId, user: req.user });
+    const invoices = await listInvoices({ customerCode: customer.code, user: req.user });
 
     // Summary
     const totalOrders = lrs.length;
@@ -45,7 +39,8 @@ export const getCustomerMIS = async (req, res) => {
       invoices
     });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to load MIS', details: err.message });
+    console.error('MIS load error:', err);
+    res.status(500).json({ error: 'Failed to load MIS' });
   }
 };
 
@@ -55,10 +50,10 @@ export const exportCustomerMISExcel = async (req, res) => {
     const { customerId } = req.params;
     if (!customerId) return res.status(400).json({ error: 'Customer id is required' });
 
-    const customer = await Customer.findById(customerId).lean();
+    const customer = await findCustomerById(customerId);
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
 
-    const lrs = await LR.find({ customer: customerId }).sort({ bookingDate: -1 }).lean();
+    const lrs = await listLRs({ customerCode: customerId, user: req.user });
 
     // Create Excel workbook
     const workbook = new ExcelJS.Workbook();
@@ -263,7 +258,8 @@ export const exportCustomerMISExcel = async (req, res) => {
 
   } catch (err) {
     console.error('Excel export error:', err);
-    res.status(500).json({ error: 'Failed to export Excel', details: err.message });
+    console.error('Excel export error:', err);
+    res.status(500).json({ error: 'Failed to export Excel' });
   }
 };
 
@@ -273,37 +269,105 @@ export const exportCustomerMISPdf = async (req, res) => {
     const { customerId } = req.params;
     if (!customerId) return res.status(400).json({ error: 'Customer id is required' });
 
-    const customer = await Customer.findById(customerId).lean();
+    const customer = await findCustomerById(customerId);
     if (!customer) return res.status(404).json({ error: 'Customer not found' });
 
-    const lrs = await LR.find({ customer: customerId }).sort({ bookingDate: -1 }).lean();
-    const invoices = await Invoice.find({ customerCode: customer.code }).sort({ date: -1 }).lean();
+    const lrs = await listLRs({ customerCode: customerId, user: req.user });
+    const invoices = await listInvoices({ customerCode: customer.code, user: req.user });
 
     // Calculate totals
     const totalOrders = lrs.length;
     const totalFreight = lrs.reduce((sum, lr) => sum + (lr.charges?.freight || 0), 0);
     const totalAmount = lrs.reduce((sum, lr) => sum + (lr.charges?.total || 0), 0);
 
-    const templatePath = path.resolve(__dirname, '../views/mis-template.ejs');
-    const html = await ejs.renderFile(templatePath, {
-      customer,
-      lrs,
-      invoices,
-      totalOrders,
-      totalFreight,
-      totalAmount,
-      generatedDate: new Date().toLocaleDateString('en-IN'),
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 10;
+    const generatedDate = new Date().toLocaleDateString('en-IN');
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(15);
+    doc.text('Client MIS Report', margin, 12);
+    doc.setFontSize(10);
+    doc.text(customer.company || customer.name || customer.code || 'Customer', margin, 19);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`Generated: ${generatedDate}`, pageWidth - margin, 12, { align: 'right' });
+    doc.text(`Customer Code: ${customer.code || ''}`, pageWidth - margin, 17, { align: 'right' });
+
+    doc.autoTable({
+      startY: 25,
+      margin: { left: margin, right: margin },
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [242, 204, 0], textColor: 20, fontStyle: 'bold' },
+      head: [['Total Orders', 'Total Freight', 'Total Amount', 'Invoices']],
+      body: [[
+        String(totalOrders),
+        totalFreight.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        String(invoices.length),
+      ]],
     });
 
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      landscape: true,
-      margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' }
+    const body = lrs.map((lr, index) => {
+      const freight = lr.charges?.freight || 0;
+      const total = lr.charges?.total || 0;
+      return [
+        index + 1,
+        lr.bookingDate ? new Date(lr.bookingDate).toLocaleDateString('en-IN') : '',
+        lr.lrNumber || '',
+        lr.charges?.paymentType || '',
+        lr.consignor?.city || '',
+        lr.consignee?.city || '',
+        lr.consignor?.name || '',
+        lr.consignee?.name || '',
+        lr.shipmentDetails?.numberOfArticles || 0,
+        lr.shipmentDetails?.actualWeight || 0,
+        lr.shipmentDetails?.chargedWeight || 0,
+        freight.toLocaleString('en-IN', { maximumFractionDigits: 2 }),
+        total.toLocaleString('en-IN', { maximumFractionDigits: 2 }),
+        lr.status || '',
+      ];
     });
-    await browser.close();
+
+    doc.autoTable({
+      startY: doc.lastAutoTable.finalY + 6,
+      margin: { left: margin, right: margin },
+      theme: 'grid',
+      styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak' },
+      headStyles: { fillColor: [242, 204, 0], textColor: 20, fontStyle: 'bold' },
+      columnStyles: {
+        0: { cellWidth: 8 },
+        1: { cellWidth: 16 },
+        2: { cellWidth: 22 },
+        3: { cellWidth: 12 },
+        4: { cellWidth: 18 },
+        5: { cellWidth: 18 },
+        6: { cellWidth: 36 },
+        7: { cellWidth: 36 },
+        8: { cellWidth: 12 },
+        9: { cellWidth: 14 },
+        10: { cellWidth: 14 },
+        11: { cellWidth: 18 },
+        12: { cellWidth: 18 },
+        13: { cellWidth: 20 },
+      },
+      head: [[
+        'Sr', 'Date', 'LR Number', 'Type', 'Source', 'Destination', 'Consignor',
+        'Consignee', 'Pkgs', 'Actual Wt', 'Charge Wt', 'Freight', 'Total', 'Status'
+      ]],
+      body,
+      didDrawPage: () => {
+        const pageHeight = doc.internal.pageSize.getHeight();
+        doc.setFontSize(7);
+        doc.text('Spice Express', margin, pageHeight - 5);
+        doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - 5, { align: 'right' });
+      },
+    });
+
+    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="MIS_${customer.code || customerId}_${new Date().toISOString().slice(0, 10)}.pdf"`);
@@ -311,6 +375,7 @@ export const exportCustomerMISPdf = async (req, res) => {
 
   } catch (err) {
     console.error('PDF export error:', err);
-    res.status(500).json({ error: 'Failed to export PDF', details: err.message });
+    console.error('PDF export error:', err);
+    res.status(500).json({ error: 'Failed to export PDF' });
   }
 };

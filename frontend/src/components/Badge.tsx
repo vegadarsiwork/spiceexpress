@@ -1,4 +1,4 @@
-type BadgeColor = 'green' | 'blue' | 'gray' | 'red' | 'yellow'
+type BadgeColor = 'green' | 'blue' | 'gray' | 'red' | 'yellow' | 'orange' | 'purple'
 
 type BadgeProps = {
   text: string
@@ -12,6 +12,8 @@ const colorToClasses: Record<BadgeColor, string> = {
   gray: 'bg-gray-100 text-gray-700 border-gray-200',
   red: 'bg-red-100 text-red-700 border-red-200',
   yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  orange: 'bg-orange-100 text-orange-700 border-orange-200',
+  purple: 'bg-purple-100 text-purple-700 border-purple-200',
 }
 
 export default function Badge({ text, color = 'gray', className = '' }: BadgeProps) {
@@ -22,5 +24,3 @@ export default function Badge({ text, color = 'gray', className = '' }: BadgePro
     </span>
   )
 }
-
-

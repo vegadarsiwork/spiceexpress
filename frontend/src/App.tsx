@@ -46,41 +46,7 @@ function App() {
     localStorage.setItem('dark_mode', darkMode ? 'true' : 'false');
   }, [darkMode]);
 
-  // Global fetch wrapper: detect 401 / expired JWT and force logout
-  useEffect(() => {
-    const origFetch = window.fetch.bind(window);
-    // Modal state managed in component; we will set this state when we detect expiry
-    let triggered = false;
-    (window as any).fetch = async (input: RequestInfo, init?: RequestInit) => {
-      try {
-        const res = await origFetch(input, init);
-        if (res.status === 401 && !triggered) {
-          triggered = true;
-          // parse body for message
-          let bodyText = '';
-          try {
-            const clone = res.clone();
-            const json = await clone.json().catch(() => null);
-            if (json) bodyText = (json.error || json.message || json.details || '').toString();
-          } catch {}
-          const low = (bodyText || '').toLowerCase();
-          if (low.includes('jwt expired') || low.includes('invalid token') || low.includes('unauthorized') || bodyText === '') {
-            // show modal then redirect (modal handled in component state)
-            // dispatch a custom event so React can pick it up
-            window.dispatchEvent(new CustomEvent('sessionExpired', { detail: { message: bodyText || 'Session expired' } }));
-          }
-        }
-        return res;
-      } catch (err) {
-        throw err;
-      }
-    };
-    return () => {
-      (window as any).fetch = origFetch;
-    };
-  }, []);
-
-  // Listen for sessionExpired custom event to open modal
+  // Listen for sessionExpired custom event to open modal (fired by api.ts handleUnauthorized)
   useEffect(() => {
     let timer: any = null;
     const handler = (e: any) => {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Card as ShadCard, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Input as ShadInput } from '../components/ui/input'
 import { Button as ShadButton } from '../components/ui/button'
-import { lrApi } from '../lib/api'
+import { lrApi, API_BASE_URL } from '../lib/api'
 import { motion } from 'framer-motion'
 
 
@@ -35,7 +35,7 @@ export default function Tracking() {
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
-    fetch('/api/auth/me', {
+    fetch(API_BASE_URL + '/auth/me', {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     })
       .then(res => {
@@ -112,9 +112,9 @@ export default function Tracking() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="p-4 sm:p-8 bg-gray-50 dark:bg-gray-900 min-h-full font-publicsans"
+      className="p-4 sm:p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] font-publicsans"
     >
-      <ShadCard className="max-w-2xl mx-auto bg-white dark:bg-gray-800 dark:border-gray-700 shadow-lg">
+      <ShadCard className="max-w-2xl mx-auto bg-white dark:bg-slate-900 dark:border-gray-700 shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Shipment Tracking</CardTitle>
         </CardHeader>
@@ -125,7 +125,7 @@ export default function Tracking() {
               value={lrNumber}
               onChange={e => setLrNumber(e.target.value)}
               required
-              className="max-w-xs bg-white dark:bg-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+              className="max-w-xs bg-white dark:bg-slate-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
             />
             <ShadButton type="submit" className="bg-red-500 text-white">Track</ShadButton>
           </form>
@@ -144,7 +144,7 @@ export default function Tracking() {
                     return (
                       <div key={label} className="flex-1 flex flex-col items-center relative">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-200 ${isDone ? 'bg-red-600 text-white' : isCurrent ? 'bg-red-700 text-white scale-105 shadow-lg' : 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-200 ${isDone ? 'bg-red-600 text-white' : isCurrent ? 'bg-red-700 text-white scale-105 shadow-lg' : 'bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-gray-300'}`}
                         >
                           {i + 1}
                         </div>
@@ -157,7 +157,7 @@ export default function Tracking() {
                   })}
                   {/* Cancelled bubble */}
                   <div className="flex flex-col items-center ml-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-200 border-2 ${lr.status === 'Cancelled' ? 'bg-red-900 border-red-700 text-white scale-105 shadow-lg' : 'bg-gray-200 border-gray-400 text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-500'}`}>
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-200 border-2 ${lr.status === 'Cancelled' ? 'bg-red-900 border-red-700 text-white scale-105 shadow-lg' : 'bg-gray-200 border-gray-400 text-gray-400 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-500'}`}>
                       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                       </svg>
@@ -168,7 +168,7 @@ export default function Tracking() {
               </div>
 
               {/* LR Details Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">LR Number</div>
                   <div className="font-semibold text-gray-900 dark:text-gray-100">{lr.lrNumber}</div>
@@ -188,7 +188,7 @@ export default function Tracking() {
                       {STATUS_LABELS[lr.status as LRStatus] || lr.status}
                     </span>
                   ) : (
-                    <select value={status} onChange={e => setStatus(e.target.value as LRStatus)} className="border rounded px-2 py-1 bg-white dark:bg-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-700">
+                    <select value={status} onChange={e => setStatus(e.target.value as LRStatus)} className="border rounded px-2 py-1 bg-white dark:bg-slate-900 dark:text-gray-100 border-gray-300 dark:border-gray-700">
                       {Object.keys(STATUS_LABELS).map(s => (
                         <option key={s} value={s}>{STATUS_LABELS[s]}</option>
                       ))}

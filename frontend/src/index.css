@@ -29,7 +29,23 @@
   line-height: 1.5;
   font-weight: 400;
   color: #213547;
-  background-color: #ffffff;
+  background-color: #f8fafc;
+}
+
+html,
+body {
+  background: #f8fafc;
+}
+
+html.dark,
+.dark body {
+  background: #020617;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 body {
@@ -46,7 +62,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #e2e8f0;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -56,6 +72,10 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brand-navy-hover);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #020617;
 }
 
 

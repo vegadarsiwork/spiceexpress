@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { toast } from '../lib/toast'
+import { API_BASE_URL } from '../lib/api'
 
 const DEFAULT_AVATAR = 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
 
@@ -20,7 +21,7 @@ export default function Profile() {
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
-    fetch('/api/auth/me', {
+    fetch(API_BASE_URL + '/auth/me', {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     })
       .then(res => {
@@ -74,7 +75,7 @@ export default function Profile() {
         address: form.address,
       };
       if (form.role && form.role !== user?.role) payload.role = form.role;
-      const res = await fetch('/api/auth/me', {
+      const res = await fetch(API_BASE_URL + '/auth/me', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -103,23 +104,23 @@ export default function Profile() {
   }
 
   if (loading) return (
-    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full flex items-center justify-center">
+    <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] flex items-center justify-center">
       <div className="w-full max-w-4xl mx-auto animate-pulse space-y-8">
         <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded w-1/3 mx-auto mb-6" />
         <div className="flex flex-col md:flex-row gap-10">
-          <div className="flex flex-col items-center md:items-start bg-[#F5F5F5] dark:bg-gray-800 rounded-xl p-8 w-full md:w-80 mb-8 md:mb-0">
+          <div className="flex flex-col items-center md:items-start bg-[#F5F5F5] dark:bg-slate-900 rounded-xl p-8 w-full md:w-80 mb-8 md:mb-0">
             <div className="w-28 h-28 rounded-full bg-gray-200 dark:bg-gray-700 mb-4" />
-            <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-2/3 mb-2" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2 mb-1" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
+            <div className="h-6 bg-gray-200 dark:bg-slate-900 rounded w-2/3 mb-2" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-900 rounded w-1/2 mb-1" />
+            <div className="h-4 bg-gray-200 dark:bg-slate-900 rounded w-1/3" />
           </div>
-          <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow p-8">
+          <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl shadow p-8">
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded mb-4" />
-                <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded mb-4" />
+                <div className="h-6 bg-gray-200 dark:bg-slate-900 rounded mb-4" />
+                <div className="h-6 bg-gray-200 dark:bg-slate-900 rounded mb-4" />
               </div>
-              <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded mb-4" />
+              <div className="h-6 bg-gray-200 dark:bg-slate-900 rounded mb-4" />
               <div className="flex gap-4 mt-2">
                 <div className="h-10 w-24 bg-gray-300 dark:bg-gray-700 rounded" />
                 <div className="h-10 w-24 bg-gray-300 dark:bg-gray-700 rounded" />
@@ -130,16 +131,16 @@ export default function Profile() {
       </div>
     </div>
   )
-  if (error) return <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full text-red-600 dark:text-red-400">{error}</div>
-  if (!user) return <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full text-gray-600 dark:text-gray-300">No profile data.</div>
+  if (error) return <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] text-red-600 dark:text-red-400">{error}</div>
+  if (!user) return <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] text-gray-600 dark:text-gray-300">No profile data.</div>
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full">
+    <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-extrabold mb-8 text-gray-900 dark:text-gray-100">Profile</h1>
         <div className="flex flex-col md:flex-row gap-10">
           {/* Sidebar Card */}
-          <div className="flex flex-col items-center md:items-start bg-[#F5F5F5] dark:bg-gray-800 rounded-xl p-8 w-full md:w-80 mb-8 md:mb-0">
+          <div className="flex flex-col items-center md:items-start bg-[#F5F5F5] dark:bg-slate-900 rounded-xl p-8 w-full md:w-80 mb-8 md:mb-0">
             <div className="w-28 h-28 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center mb-4 shadow-lg">
               <img src={form.avatar || DEFAULT_AVATAR} alt="avatar" className="object-cover w-full h-full transition-all duration-200 group-hover:opacity-80" />
             </div>
@@ -165,7 +166,7 @@ export default function Profile() {
                       formData.append('avatar', file);
                       const token = localStorage.getItem('auth_token');
                       try {
-                        const res = await fetch('/api/auth/upload-avatar', {
+                        const res = await fetch(API_BASE_URL + '/auth/upload-avatar', {
                           method: 'POST',
                           headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                           body: formData,
@@ -185,7 +186,7 @@ export default function Profile() {
                     value={form.avatar}
                     onChange={handleChange}
                     placeholder="Paste image URL"
-                    className="px-2 py-1 text-xs bg-white/90 dark:bg-gray-900/90 border border-gray-300 dark:border-gray-700 focus:outline-none rounded-lg flex-1"
+                    className="px-2 py-1 text-xs bg-white/90 dark:bg-slate-950/90 border border-gray-300 dark:border-gray-700 focus:outline-none rounded-lg flex-1"
                   />
                 </div>
               </div>
@@ -213,7 +214,7 @@ export default function Profile() {
           </div>
 
           {/* Main Form Card */}
-          <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow p-8">
+          <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl shadow p-8">
             <form className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

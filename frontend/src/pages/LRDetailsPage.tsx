@@ -16,7 +16,7 @@ function Stepper({ current }: { current: string }) {
         return (
           <div key={label} className="flex-1 flex flex-col items-center relative">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-200 ${isDone ? 'bg-red-600 text-white' : isCurrent ? 'bg-red-700 text-white scale-105 shadow-lg' : 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}`}
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-200 ${isDone ? 'bg-red-600 text-white' : isCurrent ? 'bg-red-700 text-white scale-105 shadow-lg' : 'bg-gray-200 text-gray-700 dark:bg-slate-900 dark:text-gray-300'}`}
             >
               {i + 1}
             </div>
@@ -138,11 +138,11 @@ export default function LRDetailsPage() {
   }
 
   return (
-    <div className="px-4 py-8 md:px-20 lg:px-40 xl:px-48 max-w-[1800px] mx-auto bg-gray-50 dark:bg-gray-950 min-h-full space-y-10 transition-colors">
+    <div className="px-4 py-8 md:px-20 lg:px-40 xl:px-48 max-w-[1800px] mx-auto bg-gray-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] space-y-10 transition-colors">
       <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 text-base text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 text-base text-gray-700 hover:bg-gray-50 dark:bg-slate-900 dark:text-white"
         >
           Back
         </button>
@@ -206,7 +206,7 @@ export default function LRDetailsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
+      <div className="rounded-2xl bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 shadow p-8 w-full transition-colors">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-base font-semibold text-gray-800 dark:text-gray-300">Tracking</div>
           <div className="text-sm text-gray-500 dark:text-gray-400">Status: <span className="font-bold text-blue-600 dark:text-blue-400">{(lr.status as string) || 'Booked'}</span></div>
@@ -228,7 +228,7 @@ export default function LRDetailsPage() {
           {showStatusSelect && (
             <form onSubmit={handleSaveStatus} className="flex flex-col sm:flex-row items-center gap-3 mt-2">
               <select
-                className="border rounded-lg px-3 py-2 text-base dark:bg-gray-800 dark:text-white"
+                className="border rounded-lg px-3 py-2 text-base dark:bg-slate-900 dark:text-white"
                 value={selectedStatus || ''}
                 onChange={e => setSelectedStatus(e.target.value)}
                 disabled={updating}
@@ -248,7 +248,7 @@ export default function LRDetailsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
+      <div className="rounded-2xl bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 shadow p-8 w-full transition-colors">
         <div className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">Shipment Info</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div>
@@ -316,7 +316,7 @@ export default function LRDetailsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
+        <div className="rounded-2xl bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 shadow p-8 w-full transition-colors">
           <div className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-300">Consignor (Sender)</div>
           <div className="space-y-2">
             <div className="text-lg font-bold text-gray-900 dark:text-white">{lr.consignor?.name || 'N/A'}</div>
@@ -340,7 +340,7 @@ export default function LRDetailsPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full transition-colors">
+        <div className="rounded-2xl bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 shadow p-8 w-full transition-colors">
           <div className="mb-3 text-base font-semibold text-gray-800 dark:text-gray-300">Consignee (Receiver)</div>
           <div className="space-y-2">
             <div className="text-lg font-bold text-gray-900 dark:text-white">{lr.consignee?.name || 'N/A'}</div>
@@ -365,7 +365,7 @@ export default function LRDetailsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow p-8 w-full max-w-3xl mx-auto transition-colors">
+      <div className="rounded-2xl bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 shadow p-8 w-full max-w-3xl mx-auto transition-colors">
         <div className="mb-3 text-lg font-semibold text-gray-800 dark:text-gray-200">Freight Bill</div>
         <div className="flex flex-col gap-2">
           {lr.charges && (
@@ -418,7 +418,7 @@ export default function LRDetailsPage() {
                 <span className="text-gray-600 dark:text-gray-400">Other Charges</span>
                 <span className="font-semibold text-gray-700 dark:text-gray-300">₹ {lr.charges.other?.toLocaleString('en-IN') ?? '0'}</span>
               </div>
-              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2 bg-gray-50 dark:bg-gray-800 px-2 -mx-2 rounded">
+              <div className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2 bg-gray-50 dark:bg-slate-900 px-2 -mx-2 rounded">
                 <span className="text-gray-700 dark:text-gray-300 font-semibold">Subtotal (Pre-Tax)</span>
                 <span className="font-bold text-gray-900 dark:text-white">₹ {(lr.charges as any).subTotal?.toLocaleString('en-IN') ?? ((lr.charges.freight || 0) + (lr.charges.docketCharge || 0) + (lr.charges.pickupCharge || 0) + (lr.charges.doorDeliveryCharge || 0) + (lr.charges.handlingCharge || 0) + (lr.charges.transhipmentCharge || 0) + ((lr.charges as any).insurance || 0) + ((lr.charges as any).fuelSurcharge || 0) + (lr.charges.other || 0)).toLocaleString('en-IN')}</span>
               </div>

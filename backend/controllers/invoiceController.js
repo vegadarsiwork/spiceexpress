@@ -1,13 +1,20 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+import ExcelJS from 'exceljs';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import { getCompany } from '../config/companies.js';
+import { findCustomerByCode } from '../lib/repositories/customersRepository.js';
+import { createInvoice as createInvoiceRecord, findInvoiceById, listInvoices } from '../lib/repositories/invoicesRepository.js';
+
 // Get all invoices (not just unpaid)
 export const getAllInvoices = async (req, res) => {
-  let filter = {};
-  if (req.user && req.user.role !== 'admin') {
-    const lrs = await LR.find({ company: req.user.company }).select('_id');
-    const lrIds = lrs.map(lr => lr._id);
-    filter.lrList = { $in: lrIds };
+  try {
+    res.json(await listInvoices({ user: req.user }));
+  } catch (err) {
+    console.error('Fetch invoices error:', err);
+    res.status(500).json({ error: 'Failed to fetch invoices' });
   }
-  const invoices = await Invoice.find(filter).populate('lrList');
-  res.json(invoices);
 };
 
 // Get invoice by ID (details)
@@ -17,33 +24,23 @@ export const getInvoiceById = async (req, res) => {
     if (!id) {
       return res.status(400).json({ error: 'Invoice id is required' });
     }
-    let invoice = await Invoice.findById(id).populate('lrList').lean();
+    const invoice = await findInvoiceById(id);
     if (!invoice) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
     // If user, restrict access to their company only
     if (req.user && req.user.role !== 'admin') {
-      const lrs = await LR.find({ company: req.user.company }).select('_id');
-      const lrIds = lrs.map(lr => lr._id.toString());
-      const invoiceLrIds = (invoice.lrList || []).map(lr => lr._id?.toString());
-      const hasAccess = invoiceLrIds.some(id => lrIds.includes(id));
+      const hasAccess = (invoice.lrList || []).some((lr) => lr.company === req.user.company);
       if (!hasAccess) {
         return res.status(403).json({ error: 'Forbidden' });
       }
     }
     res.json(invoice);
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to get invoice', details: error.message });
+    console.error('Get invoice error:', error);
+    return res.status(500).json({ error: 'Failed to get invoice' });
   }
 };
-import Invoice from '../models/Invoice.js';
-import LR from '../models/LR.js';
-import Customer from '../models/Customer.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import ExcelJS from 'exceljs';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 
 // Export Invoice Annexure as Excel with LR breakdown
 export const exportInvoiceAnnexure = async (req, res) => {
@@ -53,12 +50,12 @@ export const exportInvoiceAnnexure = async (req, res) => {
       return res.status(400).json({ error: 'Invoice id is required' });
     }
 
-    const invoice = await Invoice.findById(id).populate('lrList').lean();
+    const invoice = await findInvoiceById(id);
     if (!invoice) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
-    const customer = await Customer.findOne({ code: invoice.customerCode }).lean();
+    const customer = await findCustomerByCode(invoice.customerCode);
     const lrs = invoice.lrList || [];
 
     const workbook = new ExcelJS.Workbook();
@@ -181,24 +178,14 @@ export const exportInvoiceAnnexure = async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     return res.send(buffer);
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to export invoice annexure', details: error.message });
+    console.error('Export annexure error:', error);
+    return res.status(500).json({ error: 'Failed to export invoice annexure' });
   }
 };
 
 export const createInvoice = async (req, res) => {
-  const {
-    customerCode,
-    lrList,
-    invoiceNo,
-    invoiceDate,
-    dueDate,
-    billingOU,
-    companyCode, // 11=SPICE, 12=ASIAN
-    poNumber,
-    hsn,
-    freightValue,
-    gstPercent
-  } = req.body;
+  try {
+  const { customerCode, lrList } = req.body;
 
   if (!customerCode || !String(customerCode).trim()) {
     return res.status(400).json({ error: 'customerCode is required' });
@@ -207,57 +194,21 @@ export const createInvoice = async (req, res) => {
     return res.status(400).json({ error: 'lrList is required and must contain at least one LR id' });
   }
 
-  // Get company details based on companyCode
-  const { getCompany } = await import('../config/companies.js');
-  const company = getCompany(companyCode || '11');
-
-  const lrs = await LR.find({ _id: { $in: lrList } });
-
-  // Sum LR charges.total for invoice
-  const totalLrAmount = lrs.reduce((sum, lr) => sum + (lr.charges?.total || 0), 0);
-  const freight = Number(freightValue || 0);
-  const gst = Number(gstPercent || 0);
-  // split GST equally into CGST and SGST for domestic
-  const gstAmount = +(freight * (gst / 100));
-  const cgst = +(gstAmount / 2);
-  const sgst = +(gstAmount / 2);
-  const totalAmount = +(totalLrAmount + freight + gstAmount);
-
-  const invoice = await Invoice.create({
-    invoiceNumber: `INV-${Date.now()}`,
-    invoiceNo,
-    companyCode: companyCode || '11',
-    customerCode,
-    lrList,
-    invoiceDate: invoiceDate ? new Date(invoiceDate) : new Date(),
-    dueDate: dueDate ? new Date(dueDate) : undefined,
-    billingOU,
-    supplierName: company.name,
-    supplierGstin: company.gstin,
-    billingAddress: company.address,
-    poNumber,
-    hsn: hsn || company.hsnCode,
-    freightValue: freight,
-    cgst,
-    sgst,
-    totalAmount,
-    date: new Date()
-  });
-
+  const invoice = await createInvoiceRecord(req.body || {}, req.user);
   res.status(201).json(invoice);
+  } catch (err) {
+    console.error('Create invoice error:', err);
+    res.status(500).json({ error: 'Failed to create invoice' });
+  }
 };
 
 export const getUnpaidInvoices = async (req, res) => {
-  let filter = { status: 'unpaid' };
-  // Only admins see all invoices; users see only their company's invoices
-  if (req.user && req.user.role !== 'admin') {
-    // Find all LRs for this company
-    const lrs = await LR.find({ company: req.user.company }).select('_id');
-    const lrIds = lrs.map(lr => lr._id);
-    filter.lrList = { $in: lrIds };
+  try {
+    res.json(await listInvoices({ unpaidOnly: true, user: req.user }));
+  } catch (err) {
+    console.error('Fetch unpaid invoices error:', err);
+    res.status(500).json({ error: 'Failed to fetch unpaid invoices' });
   }
-  const invoices = await Invoice.find(filter).populate('lrList');
-  res.json(invoices);
 };
 
 export const downloadInvoice = async (req, res) => {
@@ -267,15 +218,21 @@ export const downloadInvoice = async (req, res) => {
       return res.status(400).json({ error: 'Invoice id is required' });
     }
 
-    const invoice = await Invoice.findById(id).populate('lrList').lean();
+    const invoice = await findInvoiceById(id);
     if (!invoice) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
-    const customer = await Customer.findOne({ code: invoice.customerCode }).lean();
+    if (req.user && req.user.role !== 'admin') {
+      const hasAccess = (invoice.lrList || []).some((lr) => lr.company === req.user.company);
+      if (!hasAccess) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+    }
+
+    const customer = await findCustomerByCode(invoice.customerCode);
 
     // Get company based on stored companyCode
-    const { getCompany } = await import('../config/companies.js');
     const company = getCompany(invoice.companyCode || '11');
 
     const __filename = fileURLToPath(import.meta.url);
@@ -295,7 +252,7 @@ export const downloadInvoice = async (req, res) => {
         logoPath = path.resolve(__dirname, '../public', relativeLogoPath);
         ext = company.logoPath.endsWith('.jpg') ? 'jpeg' : 'png';
       }
-      const logoBuffer = fs.readFileSync(logoPath);
+      const logoBuffer = await fs.promises.readFile(logoPath);
       logoBase64 = `data:image/${ext};base64,${logoBuffer.toString('base64')}`;
     } catch (e) {
       console.warn('Could not load logo:', e.message);
@@ -575,6 +532,7 @@ export const downloadInvoice = async (req, res) => {
     const pdfBuffer = doc.output('arraybuffer');
     return res.send(Buffer.from(pdfBuffer));
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to generate invoice PDF', details: error.message });
+    console.error('Invoice PDF error:', error);
+    return res.status(500).json({ error: 'Failed to generate invoice PDF' });
   }
 };

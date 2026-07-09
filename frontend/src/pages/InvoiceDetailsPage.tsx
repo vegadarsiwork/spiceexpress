@@ -30,7 +30,7 @@ export default function InvoiceDetailsPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Invoice Details</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
           <div className="mb-2 text-lg font-semibold text-blue-700 dark:text-blue-300">Invoice Info</div>
           <div className="mb-1">Invoice #: <span className="font-mono font-bold">{invoice.invoiceNumber}</span></div>
           <div className="mb-1">Date: {invoice.date ? new Date(invoice.date).toLocaleDateString() : '-'}</div>
@@ -40,7 +40,7 @@ export default function InvoiceDetailsPage() {
           <div className="mb-1">HSN: {invoice.hsn || '-'}</div>
           <div className="mb-1">Billing OU: {invoice.billingOU || '-'}</div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
           <div className="mb-2 text-lg font-semibold text-blue-700 dark:text-blue-300">Customer Info</div>
           <div className="mb-1">Customer: <span className="font-semibold">{customerDisplay}</span></div>
           <div className="mb-1">GSTIN: {customer.gstin || invoice.supplierGstin || '-'}</div>
@@ -48,7 +48,7 @@ export default function InvoiceDetailsPage() {
           <div className="mb-1">Contact: {customer.phone || invoice.contactDetails || '-'}</div>
         </div>
       </div>
-      <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+      <div className="mb-8 bg-white dark:bg-slate-900 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
         <div className="mb-2 text-lg font-semibold text-blue-700 dark:text-blue-300">Charges Breakdown</div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>Freight: <span className="font-bold">₹{invoice.freightValue?.toLocaleString() ?? '-'}</span></div>
@@ -58,12 +58,12 @@ export default function InvoiceDetailsPage() {
           <div>Total Amount: <span className="font-bold text-green-700 dark:text-green-300">₹{invoice.totalAmount?.toLocaleString()}</span></div>
         </div>
       </div>
-      <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+      <div className="mb-8 bg-white dark:bg-slate-900 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
         <div className="mb-2 text-lg font-semibold text-blue-700 dark:text-blue-300">Linked LRs ({Array.isArray(invoice.lrList) ? invoice.lrList.length : 0})</div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
+              <tr className="bg-slate-50 dark:bg-slate-950 text-gray-700 dark:text-gray-200">
                 <th className="px-3 py-2">AWB No</th>
                 <th className="px-3 py-2">Date</th>
                 <th className="px-3 py-2">From</th>

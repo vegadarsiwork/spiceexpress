@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { lrApi, customerApi } from '../lib/api';
 import type { Customer } from '../lib/api';
+import { AlertTriangle, Calculator, CheckCircle, Info, Package } from 'lucide-react';
 
 const customerTypes = ["Credit", "Cash", "To Pay"];
 const shipmentTypes = ["Prepaid", "Collect"];
@@ -141,10 +142,6 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 		setLoadingCustomers(true);
 		customerApi.getAll()
 			.then(data => {
-				console.log('✅ Fetched Customers:', data);
-				if (data.length > 0) {
-					// console.log('🔍 First Customer Rate Type:', typeof data[0].rate, data[0].rate);
-				}
 				setCustomers(data);
 			})
 			.catch(() => setCustomers([]))
@@ -396,9 +393,9 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 	};
 
 	return (
-		<form className="p-6 bg-gray-50 min-h-screen dark:bg-gray-900" onSubmit={handleSave}>
+		<form className="min-h-[calc(100dvh-4rem)] bg-slate-50 p-4 text-slate-950 dark:bg-slate-950 dark:text-slate-100 sm:p-6" onSubmit={handleSave}>
 			{/* Date And Time Section */}
-			<div className="mb-6 p-6 rounded shadow bg-white dark:bg-gray-800">
+			<div className="mb-6 p-6 rounded shadow bg-white dark:bg-slate-900">
 				<h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Date And Time</h2>
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 					<div>
@@ -408,7 +405,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<input
 							id="awbNumber"
 							type="text"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							placeholder="Auto Generate AWB Number"
 							value={awbNumber}
 							onChange={e => setAwbNumber(e.target.value)}
@@ -422,7 +419,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<input
 							id="code"
 							type="text"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							placeholder="Code"
 							value={code}
 							onChange={e => setCode(e.target.value)}
@@ -433,7 +430,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<input
 							id="date"
 							type="date"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							value={date}
 							onChange={e => setDate(e.target.value)}
 						/>
@@ -444,7 +441,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<input
 							id="time"
 							type="time"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							value={time}
 							onChange={e => setTime(e.target.value)}
 						/>
@@ -453,7 +450,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 			</div>
 
 			{/* Billing Type Section - PROMINENT SELECTOR */}
-			<div className="mb-6 p-6 rounded shadow bg-white dark:bg-gray-800">
+			<div className="mb-6 p-6 rounded shadow bg-white dark:bg-slate-900">
 				<h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Billing Type</h2>
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
 					{billingTypes.map((type) => (
@@ -518,12 +515,15 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						: paymentType === 'TOPAY' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
 							: 'bg-gray-100 text-gray-800 dark:bg-gray-700/30 dark:text-gray-300'
 					}`}>
-					ℹ️ {billingTypes.find(t => t.value === paymentType)?.description}
+					<div className="flex items-center gap-2">
+						<Info className="h-4 w-4 shrink-0" />
+						<span>{billingTypes.find(t => t.value === paymentType)?.description}</span>
+					</div>
 				</div>
 			</div>
 
 			{/* Shipment Type Section */}
-			<div className="bg-white dark:bg-gray-800 rounded shadow p-6 mb-6">
+			<div className="bg-white dark:bg-slate-900 rounded shadow p-6 mb-6">
 				<h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Shipment Type</h2>
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 					<div>
@@ -557,7 +557,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 					<div>
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Transport Type</label>
 						<select
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							value={transportType}
 							onChange={e => setTransportType(e.target.value)}
 						>
@@ -569,7 +569,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 					<div>
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Rate Type</label>
 						<select
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							value={rateType}
 							onChange={e => setRateType(e.target.value)}
 						>
@@ -584,20 +584,21 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 			{/* Sender and Receiver Information Section */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 				{/* Sender's Information */}
-				<div className="bg-white dark:bg-gray-800 rounded shadow p-6">
+				<div className="bg-white dark:bg-slate-900 rounded shadow p-6">
 					<div className="flex justify-between items-center mb-4">
 						<div>
 							<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Consignor (Sender)</h2>
 							{paymentType === 'TBB' && (
-								<span className="text-xs text-purple-600 dark:text-purple-400">
-									{senderCustomerId ? '✓ Customer selected - charges auto-applied' : '⚠️ Select a customer to auto-calculate charges'}
+								<span className="flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400">
+									{senderCustomerId ? <CheckCircle className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
+									{senderCustomerId ? "Customer selected - charges auto-applied" : "Select a customer to auto-calculate charges"}
 								</span>
 							)}
 						</div>
 						<div className="relative">
 							<input
 								type="text"
-								className="border rounded px-4 py-1 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+								className="border rounded px-4 py-1 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 								placeholder="Search sender by name, code, or ID"
 								value={senderName}
 								onChange={e => {
@@ -608,7 +609,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								disabled={loadingCustomers}
 							/>
 							{senderName && !senderCustomerId && (
-								<div className="absolute z-10 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded shadow mt-1 max-h-40 overflow-y-auto">
+								<div className="absolute z-10 left-0 right-0 bg-white dark:bg-slate-950 border border-gray-300 dark:border-gray-700 rounded shadow mt-1 max-h-40 overflow-y-auto">
 									{customers.filter(c =>
 										c.company.toLowerCase().includes(senderName.toLowerCase()) ||
 										c.code.toLowerCase().includes(senderName.toLowerCase()) ||
@@ -616,7 +617,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 									).map(c => (
 										<div
 											key={c._id}
-											className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+											className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-900"
 											onClick={() => {
 												setSenderCustomerId(c._id);
 												setSenderName(c.company);
@@ -639,16 +640,16 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 					<div className="space-y-3">
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Name *</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Name" value={senderName} onChange={e => setSenderName(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Name" value={senderName} onChange={e => setSenderName(e.target.value)} />
 							{errors.senderName && <div className="text-red-500 text-xs mt-1">{errors.senderName}</div>}
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Address</label>
-							<textarea className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Enter a location" rows={2} value={senderAddress} onChange={e => setSenderAddress(e.target.value)} />
+							<textarea className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Enter a location" rows={2} value={senderAddress} onChange={e => setSenderAddress(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">State *</label>
-							<select className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" value={senderState} onChange={e => setSenderState(e.target.value)}>
+							<select className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" value={senderState} onChange={e => setSenderState(e.target.value)}>
 								<option value="">--- Select Here ---</option>
 								{indianStates.map(state => (
 									<option key={state} value={state}>{state}</option>
@@ -658,35 +659,35 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">City *</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="NAGPUR" value={senderCity} onChange={e => setSenderCity(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="NAGPUR" value={senderCity} onChange={e => setSenderCity(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Pin Code</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Pin Code" value={senderPin} onChange={e => setSenderPin(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Pin Code" value={senderPin} onChange={e => setSenderPin(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Mobile</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Phone" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Phone" value={senderPhone} onChange={e => setSenderPhone(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Email</label>
-							<input type="email" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} />
+							<input type="email" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Email" value={senderEmail} onChange={e => setSenderEmail(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">GST No.</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="GST No." value={senderGstin} onChange={e => setSenderGstin(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="GST No." value={senderGstin} onChange={e => setSenderGstin(e.target.value)} />
 						</div>
 					</div>
 				</div>
 
 				{/* Receiver's Information */}
-				<div className="bg-white dark:bg-gray-800 rounded shadow p-6">
+				<div className="bg-white dark:bg-slate-900 rounded shadow p-6">
 					<div className="flex justify-between items-center mb-4">
 						<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Receiver's Information</h2>
 						<div className="relative">
 							<input
 								type="text"
-								className="border rounded px-4 py-1 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+								className="border rounded px-4 py-1 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 								placeholder="Search receiver by name, code, or ID"
 								value={receiverName}
 								onChange={e => {
@@ -697,7 +698,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								disabled={loadingCustomers}
 							/>
 							{receiverName && !receiverCustomerId && (
-								<div className="absolute z-10 left-0 right-0 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded shadow mt-1 max-h-40 overflow-y-auto">
+								<div className="absolute z-10 left-0 right-0 bg-white dark:bg-slate-950 border border-gray-300 dark:border-gray-700 rounded shadow mt-1 max-h-40 overflow-y-auto">
 									{customers.filter(c =>
 										c.company.toLowerCase().includes(receiverName.toLowerCase()) ||
 										c.code.toLowerCase().includes(receiverName.toLowerCase()) ||
@@ -705,7 +706,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 									).map(c => (
 										<div
 											key={c._id}
-											className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+											className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-900"
 											onClick={() => {
 												setReceiverCustomerId(c._id);
 												setReceiverName(c.company);
@@ -728,16 +729,16 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 					<div className="space-y-3">
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Name *</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Name" value={receiverName} onChange={e => setReceiverName(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Name" value={receiverName} onChange={e => setReceiverName(e.target.value)} />
 							{errors.receiverName && <div className="text-red-500 text-xs mt-1">{errors.receiverName}</div>}
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Address</label>
-							<textarea className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Enter a location" rows={2} value={receiverAddress} onChange={e => setReceiverAddress(e.target.value)} />
+							<textarea className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Enter a location" rows={2} value={receiverAddress} onChange={e => setReceiverAddress(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">State *</label>
-							<select className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" value={receiverState} onChange={e => setReceiverState(e.target.value)}>
+							<select className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" value={receiverState} onChange={e => setReceiverState(e.target.value)}>
 								<option value="">--- Select Here ---</option>
 								{indianStates.map(state => (
 									<option key={state} value={state}>{state}</option>
@@ -747,30 +748,30 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">City *</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="NAGPUR" value={receiverCity} onChange={e => setReceiverCity(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="NAGPUR" value={receiverCity} onChange={e => setReceiverCity(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Pin Code</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Pin Code" value={receiverPin} onChange={e => setReceiverPin(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Pin Code" value={receiverPin} onChange={e => setReceiverPin(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Mobile</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Phone" value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Phone" value={receiverPhone} onChange={e => setReceiverPhone(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Email</label>
-							<input type="email" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Email" value={receiverEmail} onChange={e => setReceiverEmail(e.target.value)} />
+							<input type="email" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="Email" value={receiverEmail} onChange={e => setReceiverEmail(e.target.value)} />
 						</div>
 						<div>
 							<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">GST No.</label>
-							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="GST No." value={receiverGstin} onChange={e => setReceiverGstin(e.target.value)} />
+							<input type="text" className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700" placeholder="GST No." value={receiverGstin} onChange={e => setReceiverGstin(e.target.value)} />
 						</div>
 					</div>
 				</div>
 			</div>
 
 			{/* Bill To Section */}
-			<div className="bg-white dark:bg-gray-800 rounded shadow p-4 mb-6 flex items-center gap-6">
+			<div className="bg-white dark:bg-slate-900 rounded shadow p-4 mb-6 flex items-center gap-6">
 				<span className="text-sm font-medium text-gray-900 dark:text-gray-100">Bill To:</span>
 				<label className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-200">
 					<input type="radio" name="billTo" value="sender" defaultChecked className="accent-primary" /> Sender
@@ -781,14 +782,14 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 			</div>
 
 			{/* Shipment Info Section */}
-			<div className="bg-white dark:bg-gray-800 rounded shadow p-6 mb-6">
+			<div className="bg-white dark:bg-slate-900 rounded shadow p-6 mb-6">
 				<h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Shipment Info</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 					<div>
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Expected Delivery Date</label>
 						<input
 							type="date"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							value={expectedDelivery}
 							onChange={e => setExpectedDelivery(e.target.value)}
 						/>
@@ -797,7 +798,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Shipment Value</label>
 						<input
 							type="text"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							placeholder="Total value of the shipment(s)"
 							value={shipmentValue}
 							onChange={e => setShipmentValue(e.target.value)}
@@ -807,7 +808,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 				<div className="mb-4">
 					<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Shipment Description</label>
 					<textarea
-						className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+						className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 						placeholder="What's inside the shipment i.e. Mobile, Laptop, Clothes etc."
 						rows={2}
 						value={shipmentDescription}
@@ -818,7 +819,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 					<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Attachment(Invoice Copy etc.)</label>
 					<input
 						type="file"
-						className="block border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+						className="block border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 						onChange={() => {/* file attachment not implemented yet */ }}
 					/>
 				</div>
@@ -827,7 +828,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">No. of Packages</label>
 						<input
 							type="number"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							value={numPackages}
 							onChange={e => setNumPackages(e.target.value)}
 							min={1}
@@ -837,7 +838,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Actual Weight (Kgs)</label>
 						<input
 							type="number"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							placeholder="Weight in Kgs"
 							value={actualWeight}
 							onChange={e => setActualWeight(e.target.value)}
@@ -849,7 +850,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Charged Weight (Kgs)</label>
 						<input
 							type="number"
-							className="w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+							className="w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
 							placeholder="Weight in Kgs"
 							value={chargedWeight}
 							onChange={e => setChargedWeight(e.target.value)}
@@ -910,16 +911,16 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 											// Optional: Update cities if blank?
 											// if (!senderCity) setSenderCity(rate.from);
 											// if (!receiverCity) setReceiverCity(rate.to);
-											alert(`Rate Applied: ₹${price}/${type === 'perKg' ? 'kg' : 'pkg'}`);
+											alert(`Rate Applied: Rs. ${price}/${type === 'perKg' ? 'kg' : 'pkg'}`);
 										}}
-										className="flex flex-col items-start p-3 bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded hover:shadow-md hover:border-purple-500 transition-all text-left group"
+										className="flex flex-col items-start p-3 bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-700 rounded hover:shadow-md hover:border-purple-500 transition-all text-left group"
 									>
 										<div className="flex justify-between w-full mb-1">
-											<span className="font-bold text-gray-800 dark:text-gray-200">₹{price} <span className="text-xs font-normal text-gray-500">/{type === 'perKg' ? 'kg' : 'pkg'}</span></span>
+											<span className="font-bold text-gray-800 dark:text-gray-200">Rs. {price} <span className="text-xs font-normal text-gray-500">/{type === 'perKg' ? 'kg' : 'pkg'}</span></span>
 											<span className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded group-hover:bg-purple-200">Apply</span>
 										</div>
 										<div className="text-sm text-gray-600 dark:text-gray-400">
-											{rate.from} ➝ {rate.to}
+											{rate.from} to {rate.to}
 										</div>
 									</button>
 								);
@@ -933,15 +934,18 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 			{(paymentType === 'PAID' || paymentType === 'TOPAY') && (
 				<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
 					<div className="mb-2">
-						<span className="text-sm font-medium text-blue-800 dark:text-blue-300">💰 Rate Calculation (Freight will be auto-calculated)</span>
+						<span className="flex items-center gap-2 text-sm font-medium text-blue-800 dark:text-blue-300">
+							<Calculator className="h-4 w-4" />
+							Rate Calculation (Freight will be auto-calculated)
+						</span>
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						{rateType === 'By Weight' && (
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Per KG Rate (₹)</label>
+								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Per KG Rate (Rs.)</label>
 								<input
 									type="number"
-									className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-blue-300 dark:border-blue-700 focus:ring-2 focus:ring-blue-500"
+									className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-blue-300 dark:border-blue-700 focus:ring-2 focus:ring-blue-500"
 									placeholder="Enter rate per kg"
 									value={perKgRate || ''}
 									onChange={e => setPerKgRate(Number(e.target.value) || 0)}
@@ -949,16 +953,16 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 									step="any"
 								/>
 								<span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-									Freight = ₹{perKgRate} × {chargedWeight || 0} kg = ₹{freight}
+									Freight = Rs. {perKgRate} x {chargedWeight || 0} kg = Rs. {freight}
 								</span>
 							</div>
 						)}
 						{rateType === 'By Package' && (
 							<div>
-								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Per Package Rate (₹)</label>
+								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Per Package Rate (Rs.)</label>
 								<input
 									type="number"
-									className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-blue-300 dark:border-blue-700 focus:ring-2 focus:ring-blue-500"
+									className="w-full border rounded px-3 py-2 text-sm bg-white dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-blue-300 dark:border-blue-700 focus:ring-2 focus:ring-blue-500"
 									placeholder="Enter rate per package"
 									value={perPackageRate || ''}
 									onChange={e => setPerPackageRate(Number(e.target.value) || 0)}
@@ -966,7 +970,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 									step="any"
 								/>
 								<span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-									Freight = ₹{perPackageRate} × {numPackages || 0} pkgs = ₹{freight}
+									Freight = Rs. {perPackageRate} x {numPackages || 0} pkgs = Rs. {freight}
 								</span>
 							</div>
 						)}
@@ -982,9 +986,9 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 			{
 				paymentType === 'FOC' ? (
 					// FOC - Show banner only, no charges
-					<div className="bg-gray-100 dark:bg-gray-800 rounded shadow p-6 mb-6">
+					<div className="bg-gray-100 dark:bg-slate-900 rounded shadow p-6 mb-6">
 						<div className="flex items-center gap-3">
-							<span className="text-2xl">📦</span>
+							<Package className="h-6 w-6 text-slate-500 dark:text-slate-300" />
 							<div>
 								<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Free of Cost Shipment</h2>
 								<p className="text-sm text-gray-600 dark:text-gray-400">No charges applicable - internal company shipment</p>
@@ -992,7 +996,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 						</div>
 					</div>
 				) : (
-					<div className="bg-white dark:bg-gray-800 rounded shadow p-6 mb-6">
+					<div className="bg-white dark:bg-slate-900 rounded shadow p-6 mb-6">
 						<div className="flex justify-between items-center mb-4">
 							<h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Taxes & Duties</h2>
 							{paymentType === 'TBB' && (
@@ -1006,7 +1010,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Freight</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={freight}
 									onChange={e => setFreight(Number(e.target.value))}
 								/>
@@ -1015,7 +1019,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Docket Charge</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={docketCharge}
 									onChange={e => setDocketCharge(Number(e.target.value))}
 								/>
@@ -1024,7 +1028,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Door Delivery</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={doorDeliveryCharge}
 									onChange={e => setDoorDeliveryCharge(Number(e.target.value))}
 								/>
@@ -1033,7 +1037,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Handling</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={handlingCharge}
 									onChange={e => setHandlingCharge(Number(e.target.value))}
 								/>
@@ -1042,7 +1046,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Pickup</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={pickupCharge}
 									onChange={e => setPickupCharge(Number(e.target.value))}
 								/>
@@ -1051,7 +1055,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Transhipment</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={transhipmentCharge}
 									onChange={e => setTranshipmentCharge(Number(e.target.value))}
 								/>
@@ -1060,7 +1064,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Insurance</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={insurance}
 									onChange={e => setInsurance(Number(e.target.value))}
 								/>
@@ -1069,7 +1073,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Fuel Surcharge</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={fuelSurcharge}
 									onChange={e => setFuelSurcharge(Number(e.target.value))}
 								/>
@@ -1078,7 +1082,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Commission</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={commission}
 									onChange={e => setCommission(Number(e.target.value))}
 								/>
@@ -1087,7 +1091,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Other</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={other}
 									onChange={e => setOther(Number(e.target.value))}
 								/>
@@ -1096,7 +1100,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Carrier Risk</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={carrierRisk}
 									onChange={e => setCarrierRisk(Number(e.target.value))}
 								/>
@@ -1105,7 +1109,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">Owner Risk</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={ownerRisk}
 									onChange={e => setOwnerRisk(Number(e.target.value))}
 								/>
@@ -1114,7 +1118,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 								<label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-200">GST Charge</label>
 								<input
 									type="number"
-									className={`w-full border rounded px-3 py-2 text-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
+									className={`w-full border rounded px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700`}
 									value={gstCharge}
 									onChange={e => setGstCharge(Number(e.target.value))}
 								/>

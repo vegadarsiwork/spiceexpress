@@ -1,26 +1,25 @@
-
 import express from 'express';
-import { createLR, getLRs, getLrCount, getLRById, downloadLR, updateLR, deleteLR } from '../controllers/lrController.js';
-import { requireAuth } from '../middleware/auth.js';
+import { createLR, getLRs, getLrCount, getLRById, trackLR, downloadLR, updateLR, deleteLR } from '../controllers/lrController.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 import upload from '../middleware/uploadImage.js';
 
 const router = express.Router();
 
-// Public tracking route - no authentication required
-router.get('/track/:id', getLRById);
-router.get('/:id', getLRById);  // Keep for backward compatibility
+// Public tracking route - limited data only
+router.get('/track/:id', trackLR);
 
-// Accept multipart/form-data for image upload
+// Specific named routes MUST come before parameterized /:id routes
+router.get('/count', requireAuth, getLrCount);
+
 // All other LR routes require authentication
 router.post('/', requireAuth, upload.fields([
   { name: 'senderProfileImage', maxCount: 1 },
   { name: 'receiverProfileImage', maxCount: 1 }
 ]), createLR);
 router.get('/', requireAuth, getLRs);
-router.get('/count', requireAuth, getLrCount);
 router.get('/:id/download', requireAuth, downloadLR);
 router.get('/:id', requireAuth, getLRById);
 router.put('/:id', requireAuth, updateLR);
-router.delete('/:id', requireAuth, deleteLR);
+router.delete('/:id', requireAuth, requireRole(['admin']), deleteLR);
 
 export default router;

@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'No build step required'"
+    "postinstall": "node -e \"console.log('No build step required for SQL Server runtime')\"",
+    "build": "node -e \"console.log('Backend build check complete')\"",
+    "db:check": "node -r dotenv/config -e \"import('./lib/sqlServer.js').then(async ({ query, closePool }) => { await query('SELECT 1 AS ok'); await closePool(); console.log('SQL Server connection OK'); })\""
   },
   "engines": {
     "node": ">=18.0.0",
@@ -19,21 +21,21 @@
   "type": "module",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "ejs": "^3.1.10",
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
-    "fs": "^0.0.1-security",
+    "express-rate-limit": "^8.3.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.2",
-    "mongoose": "^8.16.3",
+    "mssql": "^11.0.1",
     "multer": "^2.0.2",
-    "path": "^0.12.7",
     "pdf-parse": "^2.4.5",
-    "pdf2json": "^4.0.2",
-    "puppeteer": "^24.16.0"
+    "pdf2json": "^4.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

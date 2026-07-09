@@ -146,7 +146,10 @@ export default function AddCustomer() {
     try {
       const res = await fetch(`${API_BASE_URL}/customers`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+        },
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error('Failed to add customer');
@@ -159,11 +162,11 @@ export default function AddCustomer() {
   }
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Add Customer</h1>
       </div>
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow p-8 max-w-4xl mx-auto space-y-8 border border-gray-200 dark:border-gray-700">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-xl shadow p-8 max-w-4xl mx-auto space-y-8 border border-gray-200 dark:border-gray-700">
         {/* Customer Information */}
         <div>
           <h2 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-100">Customer Information</h2>
@@ -312,7 +315,7 @@ export default function AddCustomer() {
           {Object.keys(form.rate).length > 0 && (
             <div className="space-y-2">
               {Object.entries(form.rate).map(([laneKey, lane]) => (
-                <div key={laneKey} className="flex items-center gap-4 p-3 rounded-lg bg-gray-100 dark:bg-gray-900">
+                <div key={laneKey} className="flex items-center gap-4 p-3 rounded-lg bg-gray-100 dark:bg-slate-950">
                   <span className="text-gray-900 dark:text-gray-100 font-medium">{lane.from} → {lane.to}</span>
                   <span className="text-gray-700 dark:text-gray-200">
                     ₹{lane.rate} / {lane.rateType === 'perKg' ? 'kg' : 'package'}

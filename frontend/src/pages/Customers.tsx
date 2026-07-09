@@ -78,7 +78,7 @@ export default function Customers() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 16 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full"
+        className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]"
       >
         <div className="flex items-center justify-center h-64">
           <div className="text-lg text-gray-600 dark:text-gray-300">Loading customers...</div>
@@ -93,20 +93,20 @@ export default function Customers() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full relative"
+      className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)] relative"
     >
       <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Customers</h1>
 
       {/* Floating Add Customer Button */}
       <button
-        onClick={() => window.location.href = '/add-customer'}
+        onClick={() => window.location.href = '/admin/add-customer'}
         className="fixed bottom-8 right-8 z-50 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold text-lg transition-colors"
       >
         + Add Customer
       </button>
 
       {/* Add Customer Form */}
-      <Card className="mb-8 bg-white dark:bg-gray-800 dark:border-gray-700">
+      <Card className="mb-8 bg-white dark:bg-slate-900 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add New Customer</h2>
         <form onSubmit={addCustomer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -203,14 +203,14 @@ export default function Customers() {
       <div>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Customer List</h2>
         {customers.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+          <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-gray-700">
             <div className="text-gray-500 text-lg dark:text-gray-400">No customers found</div>
             <div className="text-gray-400 text-sm mt-2">Add your first customer above</div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {customers.map((customer) => (
-              <Card key={customer._id} className="bg-white dark:bg-gray-800 dark:border-gray-700">
+              <Card key={customer._id} className="bg-white dark:bg-slate-900 dark:border-gray-700">
                 <div className="space-y-2">
                   <div className="font-medium text-gray-900 dark:text-gray-100">{customer.company}</div>
                   {customer.email && (

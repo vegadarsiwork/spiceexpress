@@ -3,13 +3,26 @@ services:
     name: spiceexpress-backend
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGO_URI
+      - key: MSSQL_HOST
         sync: false
+      - key: MSSQL_PORT
+        value: "1433"
+      - key: MSSQL_DATABASE
+        value: CMSDB_21052026
+      - key: MSSQL_USER
+        sync: false
+      - key: MSSQL_PASSWORD
+        sync: false
+      - key: MSSQL_ENCRYPT
+        value: "true"
+      - key: MSSQL_TRUST_CERT
+        value: "true"
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL

@@ -1,4 +1,4 @@
-import LR from '../models/LR.js';
+import { listLRs } from '../lib/repositories/lrsRepository.js';
 
 export const getBusinessComparison = async (req, res) => {
   try {
@@ -20,31 +20,11 @@ export const getBusinessComparison = async (req, res) => {
     const parseDate = (value) => (value ? new Date(value) : undefined);
 
     const getPeriodMetrics = async (startDate, endDate, code) => {
-      const match = {};
-      if (startDate || endDate) {
-        match.date = {};
-        if (startDate) match.date.$gte = startDate;
-        if (endDate) match.date.$lte = endDate;
-      }
-      if (code) {
-        // customerId maps to customerCode in LR schema
-        match.customerCode = code;
-      }
-
-      const agg = await LR.aggregate([
-        { $match: match },
-        {
-          $group: {
-            _id: null,
-            totalRevenue: { $sum: '$amount' },
-            lrCount: { $sum: 1 },
-          },
-        },
-      ]);
+      const lrs = await listLRs({ fromDate: startDate, toDate: endDate, customerCode: code, user: req.user });
 
       return {
-        totalRevenue: (agg && agg[0] && agg[0].totalRevenue) || 0,
-        lrCount: (agg && agg[0] && agg[0].lrCount) || 0,
+        revenue: lrs.reduce((sum, lr) => sum + (Number(lr.charges?.total) || 0), 0),
+        lrCount: lrs.length,
       };
     };
 
@@ -55,7 +35,8 @@ export const getBusinessComparison = async (req, res) => {
 
     return res.json({ periodA, periodB });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to compute business comparison', details: error.message });
+    console.error('Business comparison error:', error);
+    return res.status(500).json({ error: 'Failed to compute business comparison' });
   }
 };
 

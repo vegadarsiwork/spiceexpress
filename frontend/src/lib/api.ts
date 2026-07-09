@@ -3,27 +3,16 @@
 // Production: https://spiceexpress.onrender.com/api
 // Override with VITE_API_URL env var if needed
 
-const USE_LOCALHOST = false; // Toggle this for local development
-
 const PRODUCTION_URL = 'https://spiceexpress.onrender.com/api';
 const LOCAL_URL = 'http://localhost:5000/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (USE_LOCALHOST ? LOCAL_URL : PRODUCTION_URL);
-
-// Debug logging (temporary)
-console.log('🚀 API Configuration:');
-console.log('- VITE_API_URL:', import.meta.env.VITE_API_URL);
-console.log('- PROD mode:', import.meta.env.PROD);
-console.log('- MODE:', import.meta.env.MODE);
-console.log('- Final API_BASE_URL:', API_BASE_URL);
-console.log('- Current URL:', window.location.href);
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? LOCAL_URL : PRODUCTION_URL);
 
 export { API_BASE_URL };
 
 // Test API connectivity
 export async function testAPIConnection(): Promise<boolean> {
   try {
-    console.log('🔍 Testing API connection to:', API_BASE_URL.replace('/api', '/health'));
     const response = await fetch(API_BASE_URL.replace('/api', '/health'), {
       method: 'GET',
       mode: 'cors',
@@ -32,19 +21,16 @@ export async function testAPIConnection(): Promise<boolean> {
         'Content-Type': 'application/json'
       }
     });
-    console.log('🏥 Health check response:', response.status, response.statusText);
     if (response.ok) {
-      const data = await response.json();
-      console.log('✅ Backend is healthy:', data);
       return true;
     } else {
-      console.warn('⚠️ Backend responded with error:', response.status);
+      console.warn('Backend responded with error:', response.status);
       return false;
     }
   } catch (error) {
-    console.error('❌ API connection test failed:', error);
+    console.error('API connection test failed:', error);
     if (error instanceof TypeError && error.message.includes('CORS')) {
-      console.error('🚫 CORS Error: Backend is not allowing requests from this domain');
+      console.error('CORS error: backend is not allowing requests from this domain');
     }
     return false;
   }
@@ -62,7 +48,7 @@ let isRedirecting = false;
 function handleUnauthorized(response: Response): void {
   if (response.status === 401 && !isRedirecting) {
     isRedirecting = true;
-    console.warn('🔐 Unauthorized response detected - clearing auth and redirecting to login');
+    console.warn('Unauthorized response detected; clearing auth and redirecting to login.');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
 
@@ -82,7 +68,6 @@ function handleUnauthorized(response: Response): void {
 
 export async function httpGet<T>(path: string): Promise<T> {
   try {
-    console.log(`🔄 GET ${API_BASE_URL}${path}`);
     const res = await fetch(`${API_BASE_URL}${path}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -91,7 +76,6 @@ export async function httpGet<T>(path: string): Promise<T> {
       mode: 'cors',
       credentials: 'omit'
     });
-    console.log(`📊 Response:`, res.status, res.statusText);
 
     // Handle 401 immediately - redirect to login
     handleUnauthorized(res);
@@ -102,9 +86,9 @@ export async function httpGet<T>(path: string): Promise<T> {
     }
     return res.json();
   } catch (error) {
-    console.error(`❌ GET ${path} error:`, error);
+    console.error(`GET ${path} error:`, error);
     if (error instanceof TypeError && error.message.includes('CORS')) {
-      console.error('🚫 CORS Error: Check backend CORS configuration for this domain');
+      console.error('CORS error: check backend CORS configuration for this domain');
     }
     throw error;
   }
@@ -112,7 +96,6 @@ export async function httpGet<T>(path: string): Promise<T> {
 
 export async function httpPost<T>(path: string, body: unknown): Promise<T> {
   try {
-    console.log(`🔄 POST ${API_BASE_URL}${path}`, body);
     const res = await fetch(`${API_BASE_URL}${path}`, {
       method: 'POST',
       headers: {
@@ -123,7 +106,6 @@ export async function httpPost<T>(path: string, body: unknown): Promise<T> {
       mode: 'cors',
       credentials: 'omit'
     });
-    console.log(`📊 Response:`, res.status, res.statusText);
 
     // Handle 401 immediately - redirect to login
     handleUnauthorized(res);
@@ -134,18 +116,20 @@ export async function httpPost<T>(path: string, body: unknown): Promise<T> {
     }
     return res.json();
   } catch (error) {
-    console.error(`❌ POST ${path} error:`, error);
+    console.error(`POST ${path} error:`, error);
     if (error instanceof TypeError && error.message.includes('CORS')) {
-      console.error('🚫 CORS Error: Check backend CORS configuration for this domain');
+      console.error('CORS error: check backend CORS configuration for this domain');
     }
     throw error;
   }
 }
 
+
 // LR API functions
 export const lrApi = {
   getAll: () => httpGet<LR[]>('/lr'),
   getById: (id: string) => httpGet<LR>(`/lr/${id}`),
+  track: (lrNumber: string) => httpGet<LR>(`/lr/track/${encodeURIComponent(lrNumber)}`),
   getCount: () => httpGet<{ count: number }>('/lr/count'),
   create: (data: CreateLRData) => httpPost<LR>('/lr', data),
   update: (id: string, data: Partial<LR>) => fetch(`${API_BASE_URL}/lr/${id}`, {

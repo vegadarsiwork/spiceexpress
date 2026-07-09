@@ -8,7 +8,9 @@ import {
   BarChart3,
   Truck,
   FileSpreadsheet,
-  Home
+  Home,
+  ArrowLeft,
+  LogOut
 } from 'lucide-react'
 
 const navItems = [
@@ -27,12 +29,12 @@ export default function Sidebar() {
   // If user is not authenticated, show a compact sidebar with only a Login link
   if (!user) {
     return (
-      <aside className="h-screen w-64 flex flex-col border-r bg-white dark:bg-gray-900 dark:border-gray-800 fixed top-0 left-0 z-30">
-        <div className="flex h-16 items-center border-b px-6 dark:border-gray-800 shrink-0">
+      <aside className="h-screen w-64 flex flex-col border-r bg-white dark:bg-slate-950 dark:border-slate-800 fixed top-0 left-0 z-30">
+        <div className="flex h-16 items-center border-b px-6 dark:border-slate-800 shrink-0">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Navigation</h2>
         </div>
         <nav className="flex-1 p-4">
-          <NavLink to="/login" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+          <NavLink to="/login" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900">
             <User className="h-5 w-5" />
             <span>Login</span>
           </NavLink>
@@ -42,9 +44,9 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="h-screen w-64 flex flex-col border-r bg-white dark:bg-gray-900 dark:border-gray-800 fixed top-0 left-0 z-30">
+    <aside className="h-screen w-64 flex flex-col border-r bg-white dark:bg-slate-950 dark:border-slate-800 fixed top-0 left-0 z-30">
       {/* Sidebar Header */}
-      <div className="flex h-16 items-center border-b px-6 dark:border-gray-800 shrink-0">
+      <div className="flex h-16 items-center border-b px-6 dark:border-slate-800 shrink-0">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Navigation</h2>
       </div>
       {/* Navigation Items */}
@@ -57,10 +59,10 @@ export default function Sidebar() {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-900 dark:hover:text-slate-100",
                   isActive
-                    ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-                    : "text-gray-600 dark:text-gray-400"
+                    ? "bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100"
+                    : "text-slate-600 dark:text-slate-400"
                 )
               }
             >
@@ -71,16 +73,16 @@ export default function Sidebar() {
         })}
       </nav>
       {/* Sidebar Footer (Logout + User details) */}
-      <div className="border-t p-4 dark:border-gray-800 shrink-0 flex flex-col gap-3">
+      <div className="border-t p-4 dark:border-slate-800 shrink-0 flex flex-col gap-3">
         <NavLink
           to="/"
-          className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+          className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition"
         >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          <ArrowLeft className="h-5 w-5" />
           Back to Landing Page
         </NavLink>
         <button
-          className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800 transition"
+          className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-slate-900 transition"
           onClick={() => {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user');
@@ -91,12 +93,12 @@ export default function Sidebar() {
             window.location.href = '/login';
           }}
         >
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" /></svg>
+          <LogOut className="h-5 w-5" />
           Logout
         </button>
         {user && (
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400">
-            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+          <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400">
+            <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-900 flex items-center justify-center overflow-hidden">
               {user.avatar ? (
                 <img src={user.avatar} alt="avatar" className="object-cover w-8 h-8 rounded-full" />
               ) : (
@@ -113,5 +115,4 @@ export default function Sidebar() {
     </aside>
   )
 }
-
 

@@ -85,7 +85,7 @@ export default function LRsPage() {
 
   if (loading) {
     return (
-      <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full">
+      <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]">
         <div className="flex items-center justify-center h-64">
           <div className="text-lg text-gray-600 dark:text-gray-300">Loading LRs...</div>
         </div>
@@ -95,7 +95,7 @@ export default function LRsPage() {
 
   if (error) {
     return (
-      <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full">
+      <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 dark:bg-red-950 dark:border-red-900">
           <div className="text-red-800 font-medium dark:text-red-300">Error loading LRs</div>
           <div className="text-red-600 text-sm mt-1 dark:text-red-400">{error}</div>
@@ -105,7 +105,7 @@ export default function LRsPage() {
   }
 
   return (
-    <div className="p-8 bg-gray-50 dark:bg-gray-900 min-h-full">
+    <div className="p-8 bg-slate-50 dark:bg-slate-950 min-h-[calc(100dvh-4rem)]">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Lorry Receipts</h1>
 
       {/* Tabs */}
@@ -118,7 +118,7 @@ export default function LRsPage() {
               `px-4 py-2 rounded-lg text-sm border font-medium ` +
               (activeTab === tab
                 ? 'bg-red-500 text-white border-red-600'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700')
+                : 'bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-100 border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700')
             }
           >
             {tab}
@@ -131,7 +131,7 @@ export default function LRsPage() {
         <div className="flex-1">
           <Input placeholder="Search LR number, consignor, consignee" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
-        <button className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium">Date Range</button>
+        <button className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-900 text-gray-700 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium">Date Range</button>
       </div>
 
       {/* LR list */}
@@ -145,7 +145,7 @@ export default function LRsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {filtered.map((lr) => (
-            <Card key={lr._id} className="bg-white dark:bg-gray-800 dark:border-gray-700">
+            <Card key={lr._id} className="bg-white dark:bg-slate-900 dark:border-gray-700">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">{lr.bookingDate ? new Date(lr.bookingDate).toLocaleDateString() : '-'}</div>
