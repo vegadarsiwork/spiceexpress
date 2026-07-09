@@ -52,8 +52,7 @@ export default function Tracking() {
     setLoading(true)
     setLr(null)
     try {
-      const all = await lrApi.getAll()
-      const found = all.find((item: any) => item.lrNumber === lrNumber)
+      const found = await lrApi.getById(lrNumber.trim())
       if (!found) throw new Error('No LR found with that number')
       setLr(found)
   // Map legacy status values to backend values if needed

@@ -21,8 +21,9 @@ export const trackLR = async (req, res) => {
       lrNumber: lr.lrNumber,
       status: lr.status,
       bookingDate: lr.bookingDate,
-      consignor: { city: lr.consignor?.city, state: lr.consignor?.state },
-      consignee: { city: lr.consignee?.city, state: lr.consignee?.state },
+      consignor: { name: lr.consignor?.name, city: lr.consignor?.city, state: lr.consignor?.state },
+      consignee: { name: lr.consignee?.name, city: lr.consignee?.city, state: lr.consignee?.state },
+      shipmentDetails: { actualWeight: lr.shipmentDetails?.actualWeight },
       trackingEvents: (lr.trackingEvents || []).map(e => ({
         status: e.status,
         location: e.location,

@@ -324,7 +324,7 @@ export default function CreateLR({ editMode = false }: { editMode?: boolean }) {
 			lrNumber: awbNumber || undefined, // Let backend auto-generate if empty
 			companyCode: code || '11', // Pass company code for LR number prefix
 			bookingDate: date,
-			status: 'Booked' as 'Booked', // fix type for backend
+			status: 'Booked' as const,
 			customer,
 			consignor: {
 				name: senderName,
